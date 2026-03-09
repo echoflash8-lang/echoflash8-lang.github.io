@@ -33,6 +33,7 @@
             color: var(--text);
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
+            padding-top: 70px;
         }
 
         /* ===== PARTICLE CANVAS ===== */
@@ -267,8 +268,46 @@
             gap: 14px;
         }
         @media (max-width: 1200px) { .fighters { grid-template-columns: repeat(3, 1fr); } }
-        @media (max-width: 768px) { .fighters { grid-template-columns: 1fr 1fr; } }
-        @media (max-width: 500px) { .fighters { grid-template-columns: 1fr; } }
+        @media (max-width: 1024px) {
+            .nav {
+                padding: 16px 20px;
+            }
+            .nav-actions {
+                gap: 8px;
+            }
+            .nav-link {
+                display: none;
+            }
+        }
+        @media (max-width: 768px) { 
+            .fighters { grid-template-columns: 1fr 1fr; }
+            .nav-actions {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .footer-links {
+                gap: 16px;
+            }
+        }
+        @media (max-width: 500px) { 
+            .fighters { grid-template-columns: 1fr; }
+            .footer-links {
+                flex-direction: column;
+                align-items: center;
+                gap: 12px;
+            }
+            .nav {
+                padding: 12px 16px;
+            }
+            .nav-logo {
+                font-size: 1rem;
+                letter-spacing: 2px;
+            }
+            .nav-sub {
+                padding: 8px 16px;
+                font-size: 0.75rem;
+            }
+        }
 
         .fighter {
             background: var(--card);
@@ -740,26 +779,136 @@
         }
         .cta-btn.yt:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(255,0,0,0.2); }
 
+        /* ===== NAVIGATION ===== */
+        .nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(25px);
+            background: rgba(6,6,11,0.85);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.3s ease;
+        }
+        .nav-logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--cyan);
+            letter-spacing: 3px;
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+        .nav-logo:hover {
+            transform: scale(1.05);
+            text-shadow: 0 0 20px rgba(0,240,255,0.5);
+        }
+        .nav-logo span { color: var(--green); }
+        .nav-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .nav-link {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+        .nav-link:hover {
+            color: var(--text);
+            background: rgba(255,255,255,0.08);
+            transform: translateY(-1px);
+        }
+        .nav-sub {
+            padding: 10px 24px;
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            border: none;
+            border-radius: 12px;
+            color: #000;
+            font-weight: 800;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-decoration: none;
+            letter-spacing: 1px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(0,240,255,0.2);
+        }
+        .nav-sub:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(0,240,255,0.35);
+        }
+
         /* ===== FOOTER ===== */
         .footer {
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding: 50px 20px;
             text-align: center;
-            padding: 40px 20px;
-            color: #222;
-            font-size: 0.65rem;
-            font-family: 'JetBrains Mono', monospace;
-            letter-spacing: 2px;
+            background: rgba(0,0,0,0.2);
+            margin-top: 4rem;
         }
-        .footer a { color: var(--cyan); text-decoration: none; }
-        .footer a:hover { text-decoration: underline; }
-        .footer .divider {
-            width: 60px;
+        .footer-links { 
+            display: flex; 
+            justify-content: center; 
+            gap: 32px; 
+            margin-bottom: 24px; 
+            flex-wrap: wrap;
+        }
+        .footer-links a {
+            color: var(--cyan); 
+            text-decoration: none; 
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+        .footer-links a:hover {
+            color: var(--text);
+            background: rgba(0,240,255,0.1);
+            transform: translateY(-2px);
+        }
+        .footer-main {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+        .footer-sub {
+            font-size: 0.7rem;
+            color: #333;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 1px;
+        }
+        .footer-divider {
+            width: 80px;
             height: 1px;
-            background: var(--border);
-            margin: 12px auto;
+            background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+            margin: 20px auto;
         }
     </style>
 </head>
 <body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <a href="../" class="nav-logo">AI MONEY <span>LAB</span></a>
+        <div class="nav-actions">
+            <a href="../" class="nav-link">🏠 Home</a>
+            <a href="https://aimoneylabscanner.beehiiv.com/subscribe" target="_blank" class="nav-sub">FREE NEWSLETTER →</a>
+        </div>
+    </nav>
+
     <!-- Particle Background -->
     <canvas id="particles"></canvas>
 
@@ -944,12 +1093,17 @@
     </script>
 
     <!-- Footer -->
-    <div class="footer">
-        <div class="divider"></div>
-        <p>🏟️ CRYPTO ARENA — SEASON 1</p>
-        <p style="margin-top:6px;">POWERED BY <a href="https://echoflash8-lang.github.io">AI MONEY LAB</a></p>
-        <p style="margin-top:6px;color:#1a1a1a;">5 AI TRADERS • $5,000 POOL • PAPER TRADING ONLY • NOT FINANCIAL ADVICE</p>
-    </div>
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="https://www.youtube.com/@AiMoneyLab-84" target="_blank">📺 YouTube</a>
+            <a href="https://aimoneylabscanner.beehiiv.com/subscribe" target="_blank">📰 Newsletter</a>
+            <a href="../" target="_blank">🏠 Home</a>
+            <a href="https://youtube.com/shorts/D_Q9ek1mSI4" target="_blank">🎬 Latest Video</a>
+        </div>
+        <div class="footer-divider"></div>
+        <div class="footer-main">🏟️ CRYPTO ARENA — SEASON 1 — POWERED BY AI MONEY LAB</div>
+        <div class="footer-sub">5 AI TRADERS • $5,000 POOL • PAPER TRADING ONLY • NOT FINANCIAL ADVICE</div>
+    </footer>
 
     <script>
     // ===== PARTICLE BACKGROUND =====
