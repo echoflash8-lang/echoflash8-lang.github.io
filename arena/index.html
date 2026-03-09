@@ -675,20 +675,33 @@
             letter-spacing: 1px;
             margin-bottom: 4px;
         }
-        .sim-field input {
+        .sim-field input[type="range"] {
             width: 100%;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid var(--border);
+            -webkit-appearance: none;
+            appearance: none;
+            height: 8px;
+            background: rgba(255,255,255,0.08);
             border-radius: 8px;
-            padding: 10px 12px;
-            color: var(--text);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
             outline: none;
-            transition: border-color 0.3s;
+            cursor: pointer;
+            margin-top: 4px;
         }
-        .sim-field input:focus { border-color: var(--cyan); }
-        .sim-field input::placeholder { color: #888; }
+        .sim-field input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px; height: 22px;
+            background: var(--cyan);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0,240,255,0.4);
+        }
+        .sim-field input[type="range"]::-moz-range-thumb {
+            width: 22px; height: 22px;
+            background: var(--cyan);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 10px rgba(0,240,255,0.4);
+        }
         .sim-result {
             display: none;
             background: rgba(0,0,0,0.3);
@@ -1049,16 +1062,17 @@
         <div class="section-title">// Build Your Portfolio</div>
         <div class="create-card">
             <h2>🎮 Create Your Fighter</h2>
-            <div class="sub">Pick your allocations. See how you'd rank against the AIs.</div>
+            <div class="sub">Allocate your $1,000 across crypto. See how you'd rank against the 5 AIs.</div>
             <div class="sim-form" id="sim-form">
-                <div class="sim-field"><label>BTC %</label><input type="number" id="sim-btc" placeholder="40" min="0" max="100"></div>
-                <div class="sim-field"><label>ETH %</label><input type="number" id="sim-eth" placeholder="20" min="0" max="100"></div>
-                <div class="sim-field"><label>SOL %</label><input type="number" id="sim-sol" placeholder="15" min="0" max="100"></div>
-                <div class="sim-field"><label>DOGE %</label><input type="number" id="sim-doge" placeholder="0" min="0" max="100"></div>
-                <div class="sim-field"><label>AVAX %</label><input type="number" id="sim-avax" placeholder="0" min="0" max="100"></div>
-                <div class="sim-field"><label>CASH %</label><input type="number" id="sim-cash" placeholder="25" min="0" max="100"></div>
+                <div class="sim-field"><label>BTC <span id="sim-btc-val" style="color:var(--cyan)">0%</span></label><input type="range" id="sim-btc" min="0" max="100" value="0" oninput="updateSimSliders()"></div>
+                <div class="sim-field"><label>ETH <span id="sim-eth-val" style="color:var(--cyan)">0%</span></label><input type="range" id="sim-eth" min="0" max="100" value="0" oninput="updateSimSliders()"></div>
+                <div class="sim-field"><label>SOL <span id="sim-sol-val" style="color:var(--cyan)">0%</span></label><input type="range" id="sim-sol" min="0" max="100" value="0" oninput="updateSimSliders()"></div>
+                <div class="sim-field"><label>DOGE <span id="sim-doge-val" style="color:var(--cyan)">0%</span></label><input type="range" id="sim-doge" min="0" max="100" value="0" oninput="updateSimSliders()"></div>
+                <div class="sim-field"><label>AVAX <span id="sim-avax-val" style="color:var(--cyan)">0%</span></label><input type="range" id="sim-avax" min="0" max="100" value="0" oninput="updateSimSliders()"></div>
+                <div class="sim-field"><label>CASH <span id="sim-cash-val" style="color:var(--cyan)">0%</span></label><input type="range" id="sim-cash" min="0" max="100" value="0" oninput="updateSimSliders()"></div>
             </div>
-            <button class="cta-btn primary" onclick="simulateFighter()" style="margin-bottom:0;">⚔️ Battle the AIs</button>
+            <div id="sim-total" style="font-family:'JetBrains Mono',monospace;font-size:0.85rem;margin-bottom:16px;color:var(--muted);">Total: 0% — <span style="color:var(--yellow)">Move the sliders to allocate!</span></div>
+            <button class="cta-btn primary" onclick="simulateFighter()" style="margin-bottom:0;font-size:1rem;padding:16px 36px;">⚔️ Battle the AIs!</button>
             <div class="sim-result" id="sim-result">
                 <div class="sim-rank" id="sim-rank"></div>
                 <div class="sim-msg" id="sim-msg"></div>
@@ -1508,6 +1522,26 @@
     if (saved) { const c = document.querySelector(`.pick-card.${saved}`); if(c){c.classList.add('selected');c.querySelector('.pick-fans').textContent='✅ YOUR PICK';} }
 
     // ===== CREATE YOUR FIGHTER (SIMULATOR) =====
+    function updateSimSliders() {
+        const coins = ['btc','eth','sol','doge','avax','cash'];
+        let total = 0;
+        for (const c of coins) {
+            const val = parseInt(document.getElementById('sim-' + c).value) || 0;
+            document.getElementById('sim-' + c + '-val').textContent = val + '%';
+            total += val;
+        }
+        const totalEl = document.getElementById('sim-total');
+        if (total === 0) {
+            totalEl.innerHTML = 'Total: 0% — <span style="color:var(--yellow)">Move the sliders to allocate!</span>';
+        } else if (total === 100) {
+            totalEl.innerHTML = 'Total: <span style="color:var(--green)">100% ✅ Perfect!</span>';
+        } else if (total > 100) {
+            totalEl.innerHTML = 'Total: <span style="color:var(--red)">' + total + '% ⚠️ Over 100%! Reduce some.</span>';
+        } else {
+            totalEl.innerHTML = 'Total: <span style="color:var(--yellow)">' + total + '% — ' + (100-total) + '% unallocated</span>';
+        }
+    }
+
     function simulateFighter() {
         if (!currentArenaData || !livePrices) { alert('Data still loading — try again in a sec!'); return; }
         const btc = parseFloat(document.getElementById('sim-btc').value) || 0;
@@ -1518,7 +1552,11 @@
         const cash = parseFloat(document.getElementById('sim-cash').value) || 0;
         const total = btc+eth+sol+doge+avax+cash;
 
-        if (total === 0) { alert('Allocate at least some % !'); return; }
+        if (total === 0) { 
+            const totalEl = document.getElementById('sim-total');
+            totalEl.innerHTML = '<span style="color:var(--red);font-weight:700;">⚠️ Move the sliders first! Allocate your $1,000.</span>';
+            return;
+        }
 
         // Normalize
         const n = v => v / total;
