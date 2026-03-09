@@ -1,0 +1,173 @@
+{
+  "traders": {
+    "whale": {
+      "name": "Whale Watcher",
+      "emoji": "\ud83d\udc0b",
+      "style": "Follows Smart Money",
+      "color": "#3b82f6",
+      "balance": 1053.11,
+      "pnl": 53.11,
+      "pnl_pct": 5.31,
+      "holdings": [
+        {
+          "coin": "BTC",
+          "amount": 0.0073,
+          "value": 500.68,
+          "pct": 47.5
+        },
+        {
+          "coin": "ETH",
+          "amount": 0.15,
+          "value": 302.43,
+          "pct": 28.7
+        },
+        {
+          "coin": "CASH",
+          "amount": 250,
+          "value": 250.0,
+          "pct": 23.7
+        }
+      ],
+      "strategy": "Follow institutional money flows. Heavy BTC/ETH.",
+      "trade_count": 0,
+      "rank": 1
+    },
+    "momentum": {
+      "name": "Momentum Max",
+      "emoji": "\ud83d\ude80",
+      "style": "Rides The Trend",
+      "color": "#ff8800",
+      "balance": 899.52,
+      "pnl": -100.48,
+      "pnl_pct": -10.05,
+      "holdings": [
+        {
+          "coin": "SOL",
+          "amount": 4.7,
+          "value": 399.5,
+          "pct": 44.4
+        },
+        {
+          "coin": "AVAX",
+          "amount": 27,
+          "value": 250.02,
+          "pct": 27.8
+        },
+        {
+          "coin": "CASH",
+          "amount": 250,
+          "value": 250.0,
+          "pct": 27.8
+        }
+      ],
+      "strategy": "Chase breakouts. Ride momentum. Cut losers fast.",
+      "trade_count": 0,
+      "rank": 4
+    },
+    "fundamentals": {
+      "name": "Fundamentals Fred",
+      "emoji": "\ud83d\udcca",
+      "style": "Value Investor",
+      "color": "#00ff88",
+      "balance": 1003.92,
+      "pnl": 3.92,
+      "pnl_pct": 0.39,
+      "holdings": [
+        {
+          "coin": "BTC",
+          "amount": 0.0073,
+          "value": 500.68,
+          "pct": 49.9
+        },
+        {
+          "coin": "ETH",
+          "amount": 0.2,
+          "value": 403.24,
+          "pct": 40.2
+        },
+        {
+          "coin": "CASH",
+          "amount": 100,
+          "value": 100.0,
+          "pct": 10.0
+        }
+      ],
+      "strategy": "Only buy projects with strong fundamentals. BTC + ETH heavy.",
+      "trade_count": 0,
+      "rank": 3
+    },
+    "degen": {
+      "name": "Degen Dave",
+      "emoji": "\ud83c\udfb0",
+      "style": "YOLO Everything",
+      "color": "#ff3366",
+      "balance": 837.81,
+      "pnl": -162.19,
+      "pnl_pct": -16.22,
+      "holdings": [
+        {
+          "coin": "PEPE",
+          "amount": 100000000,
+          "value": 332.0,
+          "pct": 39.6
+        },
+        {
+          "coin": "DOGE",
+          "amount": 3500,
+          "value": 319.81,
+          "pct": 38.2
+        },
+        {
+          "coin": "SHIB",
+          "amount": 25000000,
+          "value": 136.0,
+          "pct": 16.2
+        },
+        {
+          "coin": "CASH",
+          "amount": 50,
+          "value": 50.0,
+          "pct": 6.0
+        }
+      ],
+      "strategy": "Memecoins only. High risk, high reward. WAGMI.",
+      "trade_count": 0,
+      "rank": 5
+    },
+    "icecold": {
+      "name": "Ice Cold",
+      "emoji": "\ud83e\uddca",
+      "style": "Slow & Steady",
+      "color": "#88ddff",
+      "balance": 1004.37,
+      "pnl": 4.37,
+      "pnl_pct": 0.44,
+      "holdings": [
+        {
+          "coin": "BTC",
+          "amount": 0.0088,
+          "value": 603.56,
+          "pct": 60.1
+        },
+        {
+          "coin": "USDC",
+          "amount": 300,
+          "value": 300.0,
+          "pct": 29.9
+        },
+        {
+          "coin": "ETH",
+          "amount": 0.05,
+          "value": 100.81,
+          "pct": 10.0
+        }
+      ],
+      "strategy": "60% BTC, 30% stablecoins. Minimize risk. Sleep well.",
+      "trade_count": 0,
+      "rank": 2
+    }
+  },
+  "total_pool": 4798.73,
+  "total_pnl": -201.26999999999998,
+  "updated": "2026-03-09T14:01:37.053711"
+}
