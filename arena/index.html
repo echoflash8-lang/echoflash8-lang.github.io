@@ -789,14 +789,101 @@
     </div>
 
     <script>
-        // Auto-refresh data simulation
-        // In production, this would fetch from the cryptoarena agent's output files
+        // Load live data from arena-state.json
+        async function loadArenaData() {
+            try {
+                const resp = await fetch('arena-state.json?' + Date.now());
+                const data = await resp.json();
+                
+                // Update stats bar
+                const pnl = data.total_pnl;
+                const pnlEl = document.getElementById('total-pnl');
+                pnlEl.textContent = (pnl >= 0 ? '+' : '') + '$' + Math.abs(pnl).toFixed(2);
+                pnlEl.className = 'val ' + (pnl >= 0 ? 'positive' : 'negative');
+                
+                document.querySelector('.stat:first-child .val').textContent = '$' + data.total_pool.toFixed(0);
+                
+                // Update fighter cards
+                const fighters = document.getElementById('fighters');
+                const ranked = Object.entries(data.traders).sort((a,b) => a[1].rank - b[1].rank);
+                
+                let html = '';
+                for (const [key, t] of ranked) {
+                    const isPos = t.pnl >= 0;
+                    const pnlClass = isPos ? 'positive' : 'negative';
+                    const sign = isPos ? '+' : '';
+                    const rankClass = t.rank === 1 ? 'rank-1' : '';
+                    
+                    let holdingsHtml = '';
+                    for (const h of t.holdings.slice(0, 3)) {
+                        holdingsHtml += `<div class="holding"><span class="coin">${h.coin}</span><span class="alloc">${h.pct}%</span></div>`;
+                    }
+                    
+                    html += `
+                    <div class="fighter ${key} ${rankClass}">
+                        <div class="rank">#${t.rank}</div>
+                        <div class="emoji">${t.emoji}</div>
+                        <div class="name">${t.name}</div>
+                        <div class="style">${t.style}</div>
+                        <div class="balance ${pnlClass}">$${t.balance.toFixed(2)}</div>
+                        <div class="pnl ${pnlClass}">${sign}$${Math.abs(t.pnl).toFixed(2)} (${sign}${t.pnl_pct}%)</div>
+                        <div class="holdings">${holdingsHtml}</div>
+                    </div>`;
+                }
+                fighters.innerHTML = html;
+                
+                // Update performance bars
+                const maxPnl = Math.max(...ranked.map(([k,t]) => Math.abs(t.pnl_pct)));
+                const perfContainer = document.querySelector('.chart-card:first-child');
+                if (perfContainer) {
+                    let perfHtml = '<h3>// Performance Comparison</h3>';
+                    for (const [key, t] of ranked) {
+                        const width = Math.max(5, (Math.abs(t.pnl_pct) / Math.max(maxPnl, 1)) * 90);
+                        const sign = t.pnl_pct >= 0 ? '+' : '';
+                        perfHtml += `
+                        <div class="perf-bar">
+                            <div class="label" style="color:${t.color}">${t.emoji} ${t.name.split(' ')[0]}</div>
+                            <div class="bar-bg"><div class="bar-fill ${key}-bar" style="width:${width}%">${sign}${t.pnl_pct}%</div></div>
+                        </div>`;
+                    }
+                    perfContainer.innerHTML = perfHtml;
+                }
+                
+                console.log('Arena data loaded:', data.updated);
+            } catch(e) {
+                console.log('Using static data (live feed not available)');
+            }
+        }
         
-        // Animate numbers on load
-        document.getElementById('total-pnl').textContent = '+$48.20';
-        document.getElementById('total-pnl').className = 'val positive';
-        document.getElementById('trade-count').textContent = '23';
-        document.getElementById('best-trade').textContent = '🐋 +$18';
+        // Load prices for ticker
+        async function loadPrices() {
+            try {
+                const resp = await fetch('live-prices.json?' + Date.now());
+                const prices = await resp.json();
+                const ticker = document.getElementById('ticker');
+                let html = '';
+                const symbols = ['BTC','ETH','SOL','DOGE','XRP','ADA','AVAX','LINK','DOT'];
+                for (const sym of symbols) {
+                    if (prices[sym]) {
+                        const p = prices[sym];
+                        const cls = p.change_24h >= 0 ? 'up' : 'down';
+                        const price = p.price >= 1 ? p.price.toLocaleString('en-US', {maximumFractionDigits:2}) : p.price.toFixed(6);
+                        html += `<span>${sym} <span class="${cls}">$${price} ${p.change_24h >= 0?'+':''}${p.change_24h.toFixed(1)}%</span></span><span class="sep">•</span>`;
+                    }
+                }
+                ticker.innerHTML = html + html; // Duplicate for seamless scroll
+            } catch(e) {
+                console.log('Using static prices');
+            }
+        }
+        
+        // Load on start
+        loadArenaData();
+        loadPrices();
+        
+        // Refresh every 60 seconds
+        setInterval(loadArenaData, 60000);
+        setInterval(loadPrices, 60000);
         
         // Add new trades periodically (simulation)
         const traders = [
