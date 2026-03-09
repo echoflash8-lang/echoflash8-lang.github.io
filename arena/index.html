@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏟️ CRYPTO ARENA — Live Battle Royale</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <title>🏟️ CRYPTO ARENA — Live AI Trading Battle Royale</title>
+    <meta name="description" content="Watch 5 AI traders battle it out with $1,000 each. Live leaderboard, trash talk, and real crypto prices.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --bg: #0a0a0f;
-            --card: rgba(255,255,255,0.03);
+            --bg: #06060b;
+            --card: rgba(255,255,255,0.025);
+            --card-hover: rgba(255,255,255,0.045);
             --border: rgba(255,255,255,0.06);
+            --border-hover: rgba(255,255,255,0.12);
             --cyan: #00f0ff;
             --green: #00ff88;
             --red: #ff3366;
@@ -20,602 +23,137 @@
             --orange: #ff8800;
             --blue: #3b82f6;
             --ice: #88ddff;
+            --text: #e0e0e0;
+            --muted: #666;
+            --dim: #333;
         }
         body {
             font-family: 'Inter', sans-serif;
             background: var(--bg);
-            color: #e0e0e0;
+            color: var(--text);
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Animated BG */
+        /* ===== PARTICLE CANVAS ===== */
+        #particles {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        /* Ambient glow */
         body::before {
             content: '';
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: 
-                radial-gradient(circle at 20% 30%, rgba(168,85,247,0.06) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(0,240,255,0.05) 0%, transparent 50%),
-                radial-gradient(circle at 50% 50%, rgba(255,51,102,0.03) 0%, transparent 50%);
+            background:
+                radial-gradient(ellipse at 15% 20%, rgba(168,85,247,0.07) 0%, transparent 50%),
+                radial-gradient(ellipse at 85% 80%, rgba(0,240,255,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(255,51,102,0.03) 0%, transparent 40%);
             z-index: -1;
-            animation: bgPulse 10s ease-in-out infinite alternate;
+            animation: ambientShift 20s ease-in-out infinite alternate;
         }
-        @keyframes bgPulse {
-            from { opacity: 0.8; }
-            to { opacity: 1; }
+        @keyframes ambientShift {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.8; }
         }
 
-        /* Header */
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255,214,0,0.2); }
+            50% { box-shadow: 0 0 40px rgba(255,214,0,0.4); }
+        }
+        @keyframes livePulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,51,102,0.7); }
+            50% { opacity: 0.6; box-shadow: 0 0 0 10px rgba(255,51,102,0); }
+        }
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+        .animate-in { animation: fadeInUp 0.6s ease-out both; }
+        .animate-in-1 { animation-delay: 0.1s; }
+        .animate-in-2 { animation-delay: 0.2s; }
+        .animate-in-3 { animation-delay: 0.3s; }
+        .animate-in-4 { animation-delay: 0.4s; }
+        .animate-in-5 { animation-delay: 0.5s; }
+
+        /* ===== HEADER ===== */
         .header {
             text-align: center;
-            padding: 30px 20px 10px;
+            padding: 40px 20px 16px;
             position: relative;
         }
         .header h1 {
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: 900;
-            letter-spacing: 4px;
-            background: linear-gradient(135deg, var(--cyan), var(--purple), var(--red));
+            letter-spacing: 6px;
+            background: linear-gradient(135deg, var(--cyan), var(--purple), var(--red), var(--yellow));
+            background-size: 300% 300%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-transform: uppercase;
+            animation: shimmer 8s ease-in-out infinite;
         }
-        .header .subtitle {
+        .header .tagline {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            color: #666;
-            margin-top: 6px;
-            letter-spacing: 3px;
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-top: 8px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
         }
         .live-badge {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: rgba(255,51,102,0.15);
-            border: 1px solid rgba(255,51,102,0.3);
-            padding: 6px 16px;
+            background: rgba(255,51,102,0.12);
+            border: 1px solid rgba(255,51,102,0.25);
+            padding: 8px 20px;
             border-radius: 100px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 700;
             color: var(--red);
-            margin-top: 12px;
+            margin-top: 16px;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
         }
         .live-dot {
             width: 8px; height: 8px;
             background: var(--red);
             border-radius: 50%;
-            animation: livePulse 1s infinite;
-        }
-        @keyframes livePulse {
-            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,51,102,0.7); }
-            50% { opacity: 0.7; box-shadow: 0 0 0 8px rgba(255,51,102,0); }
+            animation: livePulse 1.2s infinite;
         }
 
-        /* Stats bar */
-        .stats-bar {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            padding: 20px;
-            margin: 10px 20px;
-            border-radius: 12px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            flex-wrap: wrap;
-        }
-        .stat { text-align: center; }
-        .stat .val {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--cyan);
-        }
-        .stat .lbl {
-            font-size: 0.65rem;
-            color: #555;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-top: 2px;
-        }
-
-        /* Leaderboard */
-        .leaderboard {
-            max-width: 1400px;
-            margin: 20px auto;
-            padding: 0 20px;
-        }
-        .section-title {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-            color: var(--cyan);
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-            padding-left: 4px;
-        }
-
-        /* Fighter Cards */
-        .fighters {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 16px;
-        }
-        @media (max-width: 1200px) { .fighters { grid-template-columns: repeat(3, 1fr); } }
-        @media (max-width: 768px) { .fighters { grid-template-columns: 1fr; } }
-
-        .fighter {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s;
-        }
-        .fighter:hover {
-            transform: translateY(-4px);
-            border-color: rgba(255,255,255,0.1);
-        }
-        .fighter.rank-1 { border-color: rgba(255,214,0,0.3); }
-        .fighter.rank-1::before {
-            content: '👑';
-            position: absolute;
-            top: 10px;
-            right: 14px;
-            font-size: 1.4rem;
-        }
-        .fighter .rank {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 3rem;
-            font-weight: 900;
-            position: absolute;
-            top: 10px;
-            right: 16px;
-            opacity: 0.06;
-        }
-        /* Avatars */
-        .fighter .avatar-ring {
-            width: 72px; height: 72px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 12px;
-            position: relative;
-            background: var(--card);
-            border: 3px solid rgba(255,255,255,0.08);
-            overflow: hidden;
-        }
-        .whale .avatar-ring { border-color: var(--blue); box-shadow: 0 0 20px rgba(59,130,246,0.2); background: radial-gradient(circle, rgba(59,130,246,0.15), transparent); }
-        .momentum .avatar-ring { border-color: var(--orange); box-shadow: 0 0 20px rgba(255,136,0,0.2); background: radial-gradient(circle, rgba(255,136,0,0.15), transparent); }
-        .fundamentals .avatar-ring { border-color: var(--green); box-shadow: 0 0 20px rgba(0,255,136,0.2); background: radial-gradient(circle, rgba(0,255,136,0.15), transparent); }
-        .degen .avatar-ring { border-color: var(--red); box-shadow: 0 0 20px rgba(255,51,102,0.2); background: radial-gradient(circle, rgba(255,51,102,0.15), transparent); }
-        .icecold .avatar-ring { border-color: var(--ice); box-shadow: 0 0 20px rgba(136,221,255,0.2); background: radial-gradient(circle, rgba(136,221,255,0.15), transparent); }
-        .rank-1 .avatar-ring { animation: glowPulse 2s ease-in-out infinite; }
-        @keyframes glowPulse {
-            0%, 100% { box-shadow: 0 0 20px rgba(255,214,0,0.3); border-color: var(--yellow); }
-            50% { box-shadow: 0 0 35px rgba(255,214,0,0.5); border-color: var(--yellow); }
-        }
-        .fighter .avatar-emoji { font-size: 2.2rem; }
-        .fighter .avatar-tag {
-            position: absolute;
-            bottom: -2px;
-            right: -2px;
-            font-size: 0.65rem;
-            background: rgba(0,0,0,0.8);
-            border-radius: 6px;
-            padding: 1px 5px;
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 700;
-        }
-        .fighter .emoji { font-size: 2.2rem; margin-bottom: 10px; display: none; }
-        .fighter .name {
-            font-size: 1.1rem;
-            font-weight: 800;
-            margin-bottom: 2px;
-        }
-        .fighter .style {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.6rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 16px;
-        }
-        .whale .name { color: var(--blue); }
-        .whale .style { color: var(--blue); }
-        .momentum .name { color: var(--orange); }
-        .momentum .style { color: var(--orange); }
-        .fundamentals .name { color: var(--green); }
-        .fundamentals .style { color: var(--green); }
-        .degen .name { color: var(--red); }
-        .degen .style { color: var(--red); }
-        .icecold .name { color: var(--ice); }
-        .icecold .style { color: var(--ice); }
-
-        .fighter .balance {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1.6rem;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-        .fighter .pnl {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-        .positive { color: var(--green); }
-        .negative { color: var(--red); }
-
-        /* Holdings */
-        .holdings { margin-bottom: 12px; }
-        .holding {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-            font-size: 0.8rem;
-        }
-        .holding .coin {
-            font-weight: 600;
-            font-family: 'JetBrains Mono', monospace;
-        }
-        .holding .alloc {
-            font-family: 'JetBrains Mono', monospace;
-            color: #888;
-            font-size: 0.75rem;
-        }
-
-        /* Trade Feed */
-        .trade-ticker {
-            max-width: 1400px;
-            margin: 20px auto;
-            padding: 0 20px;
-        }
-        .trades {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .trade {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-            font-size: 0.8rem;
-        }
-        .trade .time {
-            font-family: 'JetBrains Mono', monospace;
-            color: #444;
-            font-size: 0.7rem;
-            min-width: 60px;
-        }
-        .trade .trader { font-weight: 600; min-width: 120px; }
-        .trade .action {
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 700;
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 4px;
-            min-width: 40px;
-            text-align: center;
-        }
-        .trade .action.buy { background: rgba(0,255,136,0.1); color: var(--green); }
-        .trade .action.sell { background: rgba(255,51,102,0.1); color: var(--red); }
-        .trade .detail { color: #888; }
-
-        /* Chart area */
-        .chart-area {
-            max-width: 1400px;
-            margin: 20px auto;
-            padding: 0 20px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-        @media (max-width: 768px) { .chart-area { grid-template-columns: 1fr; } }
-        .chart-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-        }
-        .chart-card h3 {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-            color: var(--cyan);
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-bottom: 16px;
-        }
-
-        /* Performance bars */
-        .perf-bar {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        .perf-bar .label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            min-width: 100px;
-        }
-        .perf-bar .bar-bg {
-            flex: 1;
-            height: 24px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 6px;
-            overflow: hidden;
-            position: relative;
-        }
-        .perf-bar .bar-fill {
-            height: 100%;
-            border-radius: 6px;
-            transition: width 1s ease;
-            display: flex;
-            align-items: center;
-            padding-left: 8px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-            font-weight: 700;
-        }
-        .whale-bar { background: linear-gradient(90deg, var(--blue), rgba(59,130,246,0.3)); }
-        .momentum-bar { background: linear-gradient(90deg, var(--orange), rgba(255,136,0,0.3)); }
-        .fundamentals-bar { background: linear-gradient(90deg, var(--green), rgba(0,255,136,0.3)); }
-        .degen-bar { background: linear-gradient(90deg, var(--red), rgba(255,51,102,0.3)); }
-        .icecold-bar { background: linear-gradient(90deg, var(--ice), rgba(136,221,255,0.3)); }
-
-        /* Trash Talk */
-        .trash-talk {
-            max-width: 1400px;
-            margin: 20px auto;
-            padding: 0 20px;
-        }
-        .talk-bubbles {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 12px;
-        }
-        .talk-bubble {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            position: relative;
-            transition: all 0.3s;
-        }
-        .talk-bubble:hover { transform: scale(1.02); }
-        .talk-bubble .speaker {
-            font-weight: 700;
-            font-size: 0.85rem;
-            margin-bottom: 6px;
-        }
-        .talk-bubble .quote {
-            font-size: 0.8rem;
-            color: #aaa;
-            font-style: italic;
-            line-height: 1.5;
-        }
-
-        /* Pick Your Fighter */
-        .pick-fighter {
-            max-width: 1400px;
-            margin: 30px auto;
-            padding: 0 20px;
-            text-align: center;
-        }
-        .pick-fighter h2 {
-            font-size: 1.8rem;
-            font-weight: 900;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, var(--yellow), var(--orange));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .pick-fighter .sub {
-            color: #666;
-            font-size: 0.9rem;
-            margin-bottom: 24px;
-        }
-        .pick-cards {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-        .pick-card {
-            background: var(--card);
-            border: 2px solid var(--border);
-            border-radius: 16px;
-            padding: 20px 24px;
-            cursor: pointer;
-            transition: all 0.3s;
-            min-width: 140px;
-            text-align: center;
-        }
-        .pick-card:hover { transform: translateY(-6px); }
-        .pick-card .pick-emoji { font-size: 2.5rem; margin-bottom: 8px; }
-        .pick-card .pick-name { font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; }
-        .pick-card .pick-fans {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-            color: #666;
-        }
-        .pick-card.whale:hover { border-color: var(--blue); box-shadow: 0 8px 30px rgba(59,130,246,0.2); }
-        .pick-card.momentum:hover { border-color: var(--orange); box-shadow: 0 8px 30px rgba(255,136,0,0.2); }
-        .pick-card.fundamentals:hover { border-color: var(--green); box-shadow: 0 8px 30px rgba(0,255,136,0.2); }
-        .pick-card.degen:hover { border-color: var(--red); box-shadow: 0 8px 30px rgba(255,51,102,0.2); }
-        .pick-card.icecold:hover { border-color: var(--ice); box-shadow: 0 8px 30px rgba(136,221,255,0.2); }
-        .pick-card.selected { transform: translateY(-6px); }
-        .pick-card.selected.whale { border-color: var(--blue); background: rgba(59,130,246,0.1); }
-        .pick-card.selected.momentum { border-color: var(--orange); background: rgba(255,136,0,0.1); }
-        .pick-card.selected.fundamentals { border-color: var(--green); background: rgba(0,255,136,0.1); }
-        .pick-card.selected.degen { border-color: var(--red); background: rgba(255,51,102,0.1); }
-        .pick-card.selected.icecold { border-color: var(--ice); background: rgba(136,221,255,0.1); }
-
-        .cta-area {
-            margin-top: 30px;
-            text-align: center;
-        }
-        .cta-btn {
-            display: inline-block;
-            padding: 14px 32px;
-            background: linear-gradient(135deg, var(--cyan), var(--green));
-            border: none;
-            border-radius: 10px;
-            color: #000;
-            font-weight: 800;
-            font-size: 0.95rem;
-            cursor: pointer;
-            text-decoration: none;
-            transition: transform 0.2s, box-shadow 0.2s;
-            letter-spacing: 0.5px;
-            margin: 0 8px;
-        }
-        .cta-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 30px rgba(0,240,255,0.3);
-        }
-        .cta-btn.yt {
-            background: linear-gradient(135deg, #ff0000, #cc0000);
-            color: white;
-        }
-
-        /* Performance Timeline */
-        .timeline-section {
-            max-width: 1400px;
-            margin: 20px auto;
-            padding: 0 20px;
-        }
-        .timeline-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 24px;
-        }
-        .timeline-card canvas {
-            max-height: 320px;
-        }
-
-        /* Roast Battle */
-        .roast-battle {
-            max-width: 1400px;
-            margin: 20px auto;
-            padding: 0 20px;
-        }
-        .roast-card {
-            background: linear-gradient(135deg, rgba(255,51,102,0.05), rgba(168,85,247,0.05));
-            border: 1px solid rgba(255,51,102,0.15);
-            border-radius: 16px;
-            padding: 24px;
-            position: relative;
-            overflow: hidden;
-        }
-        .roast-card::before {
-            content: '⚔️';
-            position: absolute;
-            top: -10px;
-            right: 20px;
-            font-size: 4rem;
-            opacity: 0.08;
-        }
-        .roast-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-        .roast-header h3 {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-            color: var(--red);
-            letter-spacing: 4px;
-            text-transform: uppercase;
-        }
-        .roast-vs {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 30px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        .roast-fighter {
-            text-align: center;
-            min-width: 100px;
-        }
-        .roast-fighter .rf-emoji { font-size: 2.5rem; margin-bottom: 6px; }
-        .roast-fighter .rf-name { font-weight: 800; font-size: 0.9rem; }
-        .roast-fighter .rf-pnl {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
-        .roast-vs-badge {
-            font-size: 1.5rem;
-            font-weight: 900;
-            color: var(--yellow);
-            text-shadow: 0 0 20px rgba(255,214,0,0.5);
-        }
-        .roast-exchange {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .roast-line {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 12px 16px;
-            border-radius: 12px;
-            background: rgba(0,0,0,0.2);
-            font-size: 0.85rem;
-            line-height: 1.5;
-        }
-        .roast-line .rl-emoji { font-size: 1.3rem; flex-shrink: 0; }
-        .roast-line .rl-text { color: #ccc; }
-        .roast-line .rl-text strong { color: #fff; }
-        .roast-timer {
-            text-align: center;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.65rem;
-            color: #444;
-            margin-top: 12px;
-            letter-spacing: 2px;
-        }
-
-        /* Footer */
-        .footer {
-            text-align: center;
-            padding: 30px;
-            color: #333;
-            font-size: 0.7rem;
-            font-family: 'JetBrains Mono', monospace;
-            letter-spacing: 2px;
-        }
-        .footer a { color: var(--cyan); text-decoration: none; }
-
-        /* Ticker tape */
+        /* ===== TICKER TAPE ===== */
         .ticker-tape {
-            background: rgba(0,0,0,0.4);
+            background: rgba(0,0,0,0.5);
             border-top: 1px solid var(--border);
             border-bottom: 1px solid var(--border);
-            padding: 8px 0;
+            padding: 10px 0;
             overflow: hidden;
             white-space: nowrap;
-            margin: 10px 0;
+            margin: 16px 0;
         }
         .ticker-content {
             display: inline-block;
-            animation: tickerScroll 30s linear infinite;
+            animation: tickerScroll 35s linear infinite;
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.75rem;
             color: #888;
@@ -626,114 +164,694 @@
         }
         .ticker-content .up { color: var(--green); }
         .ticker-content .down { color: var(--red); }
-        .ticker-content .sep { color: #333; margin: 0 16px; }
+        .ticker-content .sep { color: #222; margin: 0 20px; }
+
+        /* ===== STATS BAR ===== */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            padding: 0 20px;
+            margin: 16px auto;
+            max-width: 900px;
+            flex-wrap: wrap;
+        }
+        .stat {
+            text-align: center;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 24px;
+            flex: 1;
+            min-width: 120px;
+            transition: all 0.3s;
+        }
+        .stat:hover { border-color: var(--border-hover); background: var(--card-hover); }
+        .stat .val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--cyan);
+        }
+        .stat .lbl {
+            font-size: 0.6rem;
+            color: #444;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 4px;
+        }
+
+        /* ===== SECTION TITLES ===== */
+        .section-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--cyan);
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+            padding-left: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--border), transparent);
+        }
+
+        /* ===== MARKET SENTIMENT GAUGE ===== */
+        .sentiment-section {
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .sentiment-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+        }
+        .sentiment-gauge {
+            position: relative;
+            width: 200px;
+            height: 110px;
+            margin: 0 auto 12px;
+            overflow: hidden;
+        }
+        .sentiment-gauge svg { width: 200px; height: 110px; }
+        .gauge-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        .gauge-text {
+            font-size: 0.75rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* ===== FIGHTER CARDS ===== */
+        .leaderboard {
+            max-width: 1400px;
+            margin: 24px auto;
+            padding: 0 20px;
+        }
+        .fighters {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 14px;
+        }
+        @media (max-width: 1200px) { .fighters { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 768px) { .fighters { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 500px) { .fighters { grid-template-columns: 1fr; } }
+
+        .fighter {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .fighter:hover {
+            transform: translateY(-6px);
+            border-color: var(--border-hover);
+            background: var(--card-hover);
+        }
+        .fighter.rank-1 {
+            border-color: rgba(255,214,0,0.25);
+            background: linear-gradient(135deg, rgba(255,214,0,0.04), var(--card));
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+        .fighter .rank-badge {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.05);
+            color: #555;
+        }
+        .fighter.rank-1 .rank-badge { background: rgba(255,214,0,0.15); color: var(--yellow); }
+        .fighter.rank-2 .rank-badge { background: rgba(192,192,192,0.1); color: #ccc; }
+        .fighter.rank-3 .rank-badge { background: rgba(205,127,50,0.1); color: #cd7f32; }
+
+        /* Avatar */
+        .avatar-container { position: relative; margin-bottom: 14px; display: inline-block; }
+        .avatar-ring {
+            width: 68px; height: 68px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid rgba(255,255,255,0.06);
+            position: relative;
+            transition: all 0.3s;
+        }
+        .fighter:hover .avatar-ring { transform: scale(1.08); }
+        .whale .avatar-ring { border-color: rgba(59,130,246,0.4); background: radial-gradient(circle, rgba(59,130,246,0.12), transparent); }
+        .momentum .avatar-ring { border-color: rgba(255,136,0,0.4); background: radial-gradient(circle, rgba(255,136,0,0.12), transparent); }
+        .fundamentals .avatar-ring { border-color: rgba(0,255,136,0.4); background: radial-gradient(circle, rgba(0,255,136,0.12), transparent); }
+        .degen .avatar-ring { border-color: rgba(255,51,102,0.4); background: radial-gradient(circle, rgba(255,51,102,0.12), transparent); }
+        .icecold .avatar-ring { border-color: rgba(136,221,255,0.4); background: radial-gradient(circle, rgba(136,221,255,0.12), transparent); }
+        .avatar-emoji { font-size: 2rem; }
+        .avatar-streak {
+            position: absolute;
+            bottom: -4px; right: -4px;
+            font-size: 0.9rem;
+            background: rgba(0,0,0,0.9);
+            border-radius: 50%;
+            width: 24px; height: 24px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .fighter .name { font-size: 1.05rem; font-weight: 800; margin-bottom: 2px; }
+        .fighter .style {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.55rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 14px;
+            opacity: 0.6;
+        }
+        .whale .name { color: var(--blue); }
+        .momentum .name { color: var(--orange); }
+        .fundamentals .name { color: var(--green); }
+        .degen .name { color: var(--red); }
+        .icecold .name { color: var(--ice); }
+
+        .fighter .balance {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+        .fighter .pnl {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 14px;
+        }
+        .positive { color: var(--green); }
+        .negative { color: var(--red); }
+
+        /* Risk meter */
+        .risk-meter { margin-bottom: 14px; }
+        .risk-label {
+            font-size: 0.6rem;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .risk-bar-bg {
+            height: 4px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .risk-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+        .risk-low { background: linear-gradient(90deg, var(--green), rgba(0,255,136,0.4)); }
+        .risk-med { background: linear-gradient(90deg, var(--yellow), rgba(255,214,0,0.4)); }
+        .risk-high { background: linear-gradient(90deg, var(--orange), rgba(255,136,0,0.4)); }
+        .risk-extreme { background: linear-gradient(90deg, var(--red), rgba(255,51,102,0.4)); }
+
+        /* Holdings */
+        .holdings { margin-bottom: 4px; }
+        .holding {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.025);
+            font-size: 0.75rem;
+        }
+        .holding:last-child { border-bottom: none; }
+        .holding .coin { font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+        .holding .alloc { font-family: 'JetBrains Mono', monospace; color: #555; font-size: 0.7rem; }
+
+        /* ===== PERFORMANCE TIMELINE ===== */
+        .timeline-section {
+            max-width: 1400px;
+            margin: 28px auto;
+            padding: 0 20px;
+        }
+        .timeline-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+        }
+        .timeline-card canvas { max-height: 300px; }
+
+        /* ===== CHARTS GRID ===== */
+        .chart-area {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        @media (max-width: 768px) { .chart-area { grid-template-columns: 1fr; } }
+        .chart-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+        }
+        .chart-card h3 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--cyan);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+
+        /* Perf bars */
+        .perf-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .perf-bar .label { font-size: 0.75rem; font-weight: 600; min-width: 100px; }
+        .perf-bar .bar-bg {
+            flex: 1; height: 26px;
+            background: rgba(255,255,255,0.025);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .perf-bar .bar-fill {
+            height: 100%;
+            border-radius: 8px;
+            transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        .whale-bar { background: linear-gradient(90deg, var(--blue), rgba(59,130,246,0.2)); }
+        .momentum-bar { background: linear-gradient(90deg, var(--orange), rgba(255,136,0,0.2)); }
+        .fundamentals-bar { background: linear-gradient(90deg, var(--green), rgba(0,255,136,0.2)); }
+        .degen-bar { background: linear-gradient(90deg, var(--red), rgba(255,51,102,0.2)); }
+        .icecold-bar { background: linear-gradient(90deg, var(--ice), rgba(136,221,255,0.2)); }
+
+        /* ===== ROAST BATTLE ===== */
+        .roast-battle {
+            max-width: 1400px;
+            margin: 28px auto;
+            padding: 0 20px;
+        }
+        .roast-card {
+            background: linear-gradient(135deg, rgba(255,51,102,0.04), rgba(168,85,247,0.04), rgba(255,214,0,0.02));
+            border: 1px solid rgba(255,51,102,0.12);
+            border-radius: 20px;
+            padding: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+        .roast-card::before {
+            content: '⚔️';
+            position: absolute;
+            top: -15px; right: 20px;
+            font-size: 5rem;
+            opacity: 0.05;
+            transform: rotate(-15deg);
+        }
+        .roast-vs {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .roast-fighter { text-align: center; min-width: 100px; }
+        .roast-fighter .rf-emoji { font-size: 2.8rem; margin-bottom: 6px; }
+        .roast-fighter .rf-name { font-weight: 800; font-size: 0.9rem; }
+        .roast-fighter .rf-pnl { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 700; }
+        .roast-vs-badge {
+            font-size: 1.8rem; font-weight: 900;
+            color: var(--yellow);
+            text-shadow: 0 0 30px rgba(255,214,0,0.4);
+            animation: pulseGlow 2s infinite;
+        }
+        .roast-exchange { display: flex; flex-direction: column; gap: 10px; }
+        .roast-line {
+            display: flex; align-items: flex-start; gap: 14px;
+            padding: 14px 18px;
+            border-radius: 14px;
+            background: rgba(0,0,0,0.25);
+            font-size: 0.85rem;
+            line-height: 1.5;
+            border: 1px solid rgba(255,255,255,0.03);
+            transition: all 0.3s;
+        }
+        .roast-line:hover { background: rgba(0,0,0,0.35); border-color: rgba(255,255,255,0.06); }
+        .roast-line .rl-emoji { font-size: 1.4rem; flex-shrink: 0; }
+        .roast-line .rl-text { color: #bbb; }
+        .roast-line .rl-text strong { color: #fff; }
+        .roast-timer {
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            color: #333;
+            margin-top: 14px;
+            letter-spacing: 3px;
+        }
+
+        /* ===== TRADE FEED ===== */
+        .trade-ticker {
+            max-width: 1400px;
+            margin: 24px auto;
+            padding: 0 20px;
+        }
+        .trades {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+        .trades::-webkit-scrollbar { width: 4px; }
+        .trades::-webkit-scrollbar-track { background: transparent; }
+        .trades::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+        .trade {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 9px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.025);
+            font-size: 0.8rem;
+        }
+        .trade:last-child { border-bottom: none; }
+        .trade .time { font-family: 'JetBrains Mono', monospace; color: #333; font-size: 0.7rem; min-width: 50px; }
+        .trade .trader { font-weight: 600; min-width: 130px; }
+        .trade .action {
+            font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.65rem;
+            padding: 3px 10px; border-radius: 6px; min-width: 42px; text-align: center;
+        }
+        .trade .action.buy { background: rgba(0,255,136,0.1); color: var(--green); }
+        .trade .action.sell { background: rgba(255,51,102,0.1); color: var(--red); }
+        .trade .detail { color: #666; }
+
+        /* ===== TRASH TALK ===== */
+        .trash-talk {
+            max-width: 1400px;
+            margin: 24px auto;
+            padding: 0 20px;
+        }
+        .talk-bubbles {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+        }
+        .talk-bubble {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 18px;
+            transition: all 0.3s;
+        }
+        .talk-bubble:hover { transform: translateY(-3px) scale(1.01); border-color: var(--border-hover); }
+        .talk-bubble .speaker { font-weight: 700; font-size: 0.8rem; margin-bottom: 6px; }
+        .talk-bubble .quote { font-size: 0.78rem; color: #999; font-style: italic; line-height: 1.6; }
+
+        /* ===== CREATE YOUR FIGHTER ===== */
+        .create-fighter {
+            max-width: 700px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .create-card {
+            background: linear-gradient(135deg, rgba(0,240,255,0.04), rgba(168,85,247,0.04));
+            border: 1px solid rgba(0,240,255,0.15);
+            border-radius: 20px;
+            padding: 32px;
+            text-align: center;
+        }
+        .create-card h2 {
+            font-size: 1.6rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+        }
+        .create-card .sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 24px; }
+        .sim-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        @media (max-width: 500px) { .sim-form { grid-template-columns: 1fr 1fr; } }
+        .sim-field label {
+            display: block;
+            font-size: 0.65rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+        .sim-field input {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .sim-field input:focus { border-color: var(--cyan); }
+        .sim-field input::placeholder { color: #333; }
+        .sim-result {
+            display: none;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 16px;
+            text-align: center;
+        }
+        .sim-result .sim-rank {
+            font-size: 2.5rem;
+            font-weight: 900;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .sim-result .sim-msg {
+            font-size: 0.85rem;
+            color: #999;
+            margin-top: 6px;
+        }
+
+        /* ===== PICK YOUR FIGHTER ===== */
+        .pick-fighter {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+        .pick-fighter h2 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--yellow), var(--orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+        .pick-fighter .sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 24px; }
+        .pick-cards { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+        .pick-card {
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 18px;
+            padding: 20px 24px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            min-width: 130px;
+            text-align: center;
+            user-select: none;
+        }
+        .pick-card:hover { transform: translateY(-8px); }
+        .pick-card .pick-emoji { font-size: 2.5rem; margin-bottom: 8px; }
+        .pick-card .pick-name { font-weight: 700; font-size: 0.85rem; margin-bottom: 4px; }
+        .pick-card .pick-fans { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: #555; }
+        .pick-card.whale:hover { border-color: var(--blue); box-shadow: 0 12px 40px rgba(59,130,246,0.15); }
+        .pick-card.momentum:hover { border-color: var(--orange); box-shadow: 0 12px 40px rgba(255,136,0,0.15); }
+        .pick-card.fundamentals:hover { border-color: var(--green); box-shadow: 0 12px 40px rgba(0,255,136,0.15); }
+        .pick-card.degen:hover { border-color: var(--red); box-shadow: 0 12px 40px rgba(255,51,102,0.15); }
+        .pick-card.icecold:hover { border-color: var(--ice); box-shadow: 0 12px 40px rgba(136,221,255,0.15); }
+        .pick-card.selected { transform: translateY(-6px); }
+        .pick-card.selected.whale { border-color: var(--blue); background: rgba(59,130,246,0.08); }
+        .pick-card.selected.momentum { border-color: var(--orange); background: rgba(255,136,0,0.08); }
+        .pick-card.selected.fundamentals { border-color: var(--green); background: rgba(0,255,136,0.08); }
+        .pick-card.selected.degen { border-color: var(--red); background: rgba(255,51,102,0.08); }
+        .pick-card.selected.icecold { border-color: var(--ice); background: rgba(136,221,255,0.08); }
+
+        /* ===== CTA ===== */
+        .cta-area { margin-top: 30px; text-align: center; }
+        .cta-btn {
+            display: inline-block;
+            padding: 14px 32px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 0.5px;
+            margin: 0 6px 10px;
+        }
+        .cta-btn.primary {
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            color: #000;
+        }
+        .cta-btn.primary:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,240,255,0.25); }
+        .cta-btn.yt {
+            background: linear-gradient(135deg, #ff0000, #cc0000);
+            color: white;
+        }
+        .cta-btn.yt:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(255,0,0,0.2); }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: #222;
+            font-size: 0.65rem;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 2px;
+        }
+        .footer a { color: var(--cyan); text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
+        .footer .divider {
+            width: 60px;
+            height: 1px;
+            background: var(--border);
+            margin: 12px auto;
+        }
     </style>
 </head>
 <body>
+    <!-- Particle Background -->
+    <canvas id="particles"></canvas>
+
     <!-- HEADER -->
-    <div class="header">
+    <div class="header animate-in">
         <h1>🏟️ Crypto Arena</h1>
-        <div class="subtitle">LIVE AI TRADING BATTLE ROYALE</div>
+        <div class="tagline">5 AI Traders • $5,000 Pool • Live Battle Royale</div>
         <div class="live-badge">
             <span class="live-dot"></span>
-            LIVE — 5 AI TRADERS COMPETING
+            Season 1 — Live
         </div>
     </div>
 
-    <!-- Crypto Ticker -->
+    <!-- Ticker -->
     <div class="ticker-tape">
         <div class="ticker-content" id="ticker">
-            <span>BTC <span class="up">$67,234 +2.1%</span></span><span class="sep">•</span>
-            <span>ETH <span class="up">$3,456 +1.8%</span></span><span class="sep">•</span>
-            <span>SOL <span class="down">$142.50 -0.5%</span></span><span class="sep">•</span>
-            <span>DOGE <span class="up">$0.167 +4.2%</span></span><span class="sep">•</span>
-            <span>XRP <span class="up">$0.634 +1.1%</span></span><span class="sep">•</span>
-            <span>ADA <span class="down">$0.452 -1.3%</span></span><span class="sep">•</span>
-            <span>AVAX <span class="up">$38.90 +3.7%</span></span><span class="sep">•</span>
-            <span>LINK <span class="up">$18.23 +2.4%</span></span><span class="sep">•</span>
-            <span>DOT <span class="down">$7.89 -0.8%</span></span><span class="sep">•</span>
-            <span>MATIC <span class="up">$0.92 +1.5%</span></span><span class="sep">•</span>
-            <!-- Repeat for seamless scroll -->
-            <span>BTC <span class="up">$67,234 +2.1%</span></span><span class="sep">•</span>
-            <span>ETH <span class="up">$3,456 +1.8%</span></span><span class="sep">•</span>
-            <span>SOL <span class="down">$142.50 -0.5%</span></span><span class="sep">•</span>
-            <span>DOGE <span class="up">$0.167 +4.2%</span></span><span class="sep">•</span>
-            <span>XRP <span class="up">$0.634 +1.1%</span></span><span class="sep">•</span>
-            <span>ADA <span class="down">$0.452 -1.3%</span></span><span class="sep">•</span>
-            <span>AVAX <span class="up">$38.90 +3.7%</span></span><span class="sep">•</span>
-            <span>LINK <span class="up">$18.23 +2.4%</span></span><span class="sep">•</span>
-            <span>DOT <span class="down">$7.89 -0.8%</span></span><span class="sep">•</span>
-            <span>MATIC <span class="up">$0.92 +1.5%</span></span><span class="sep">•</span>
+            <span>Loading prices...</span>
         </div>
     </div>
 
-    <!-- Stats Bar -->
-    <div class="stats-bar">
-        <div class="stat"><div class="val">$5,000</div><div class="lbl">Total Pool</div></div>
+    <!-- Stats -->
+    <div class="stats-bar animate-in animate-in-1">
+        <div class="stat"><div class="val" id="stat-pool">$5,000</div><div class="lbl">Total Pool</div></div>
         <div class="stat"><div class="val" id="total-pnl">+$0</div><div class="lbl">Combined P&L</div></div>
-        <div class="stat"><div class="val" id="trade-count">0</div><div class="lbl">Total Trades</div></div>
-        <div class="stat"><div class="val" id="day-count">Day 1</div><div class="lbl">Competition Day</div></div>
-        <div class="stat"><div class="val" id="best-trade">—</div><div class="lbl">Best Trade</div></div>
+        <div class="stat"><div class="val" id="trade-count">0</div><div class="lbl">Trades</div></div>
+        <div class="stat"><div class="val" id="day-count">Day 1</div><div class="lbl">Season Day</div></div>
+        <div class="stat"><div class="val" id="best-trade">—</div><div class="lbl">Top Trader</div></div>
+    </div>
+
+    <!-- Market Sentiment -->
+    <div class="sentiment-section animate-in animate-in-2">
+        <div class="section-title">// Market Sentiment</div>
+        <div class="sentiment-card">
+            <div class="sentiment-gauge">
+                <svg viewBox="0 0 200 110">
+                    <defs>
+                        <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#ff3366"/>
+                            <stop offset="25%" style="stop-color:#ff8800"/>
+                            <stop offset="50%" style="stop-color:#ffd600"/>
+                            <stop offset="75%" style="stop-color:#88ddff"/>
+                            <stop offset="100%" style="stop-color:#00ff88"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="12" stroke-linecap="round"/>
+                    <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="url(#gaugeGrad)" stroke-width="12" stroke-linecap="round" stroke-dasharray="251" stroke-dashoffset="251" id="gauge-arc"/>
+                    <circle cx="100" cy="100" r="4" fill="var(--yellow)" id="gauge-needle" />
+                </svg>
+            </div>
+            <div class="gauge-label" id="gauge-label">Calculating...</div>
+            <div class="gauge-text" id="gauge-text">ARENA SENTIMENT</div>
+        </div>
     </div>
 
     <!-- Fighter Cards -->
-    <div class="leaderboard">
+    <div class="leaderboard animate-in animate-in-3">
         <div class="section-title">// Leaderboard</div>
         <div class="fighters" id="fighters">
-            <!-- Dynamic cards loaded by JS -->
-        </div>
-    </div>
-
-    <!-- Charts -->
-    <div class="chart-area">
-        <div class="chart-card">
-            <h3>// Performance Comparison</h3>
-            <div class="perf-bar">
-                <div class="label" style="color:var(--blue)">🐋 Whale</div>
-                <div class="bar-bg"><div class="bar-fill whale-bar" style="width: 69%">+3.45%</div></div>
-            </div>
-            <div class="perf-bar">
-                <div class="label" style="color:var(--orange)">🚀 Momentum</div>
-                <div class="bar-bg"><div class="bar-fill momentum-bar" style="width: 56%">+2.28%</div></div>
-            </div>
-            <div class="perf-bar">
-                <div class="label" style="color:var(--green)">📊 Fred</div>
-                <div class="bar-bg"><div class="bar-fill fundamentals-bar" style="width: 45%">+1.52%</div></div>
-            </div>
-            <div class="perf-bar">
-                <div class="label" style="color:var(--ice)">🧊 Ice Cold</div>
-                <div class="bar-bg"><div class="bar-fill icecold-bar" style="width: 34%">+0.84%</div></div>
-            </div>
-            <div class="perf-bar">
-                <div class="label" style="color:var(--red)">🎰 Degen</div>
-                <div class="bar-bg"><div class="bar-fill degen-bar" style="width: 20%">-3.27%</div></div>
-            </div>
-        </div>
-
-        <div class="chart-card">
-            <h3>// Strategy Breakdown</h3>
-            <div style="font-size: 0.85rem; line-height: 2;">
-                <p>🐋 <strong>Whale Watcher</strong> — Heavy BTC/ETH following institutional buys</p>
-                <p>🚀 <strong>Momentum Max</strong> — Chasing SOL + AVAX momentum breakout</p>
-                <p>📊 <strong>Fred</strong> — Conservative BTC/ETH 90/10 allocation</p>
-                <p>🎰 <strong>Degen Dave</strong> — All-in memecoins, down bad but one pump away</p>
-                <p>🧊 <strong>Ice Cold</strong> — 60% BTC, 30% stablecoin safety net</p>
-            </div>
+            <!-- Dynamic -->
         </div>
     </div>
 
     <!-- Performance Timeline -->
-    <div class="timeline-section">
-        <div class="section-title">// Performance Over Time 📈</div>
+    <div class="timeline-section animate-in">
+        <div class="section-title">// Performance Over Time</div>
         <div class="timeline-card">
             <canvas id="perfChart"></canvas>
         </div>
     </div>
 
+    <!-- Charts -->
+    <div class="chart-area animate-in">
+        <div class="chart-card">
+            <h3>// Performance Bars</h3>
+            <div id="perf-bars"></div>
+        </div>
+        <div class="chart-card">
+            <h3>// Strategy Breakdown</h3>
+            <div style="font-size:0.82rem;line-height:2.2;color:#bbb;">
+                <p>🐋 <strong style="color:var(--blue)">Whale Watcher</strong> — Follows institutional money into BTC/ETH</p>
+                <p>🚀 <strong style="color:var(--orange)">Momentum Max</strong> — Chases breakouts, rides the trend</p>
+                <p>📊 <strong style="color:var(--green)">Fundamentals Fred</strong> — Conservative 90/10 BTC/ETH</p>
+                <p>🎰 <strong style="color:var(--red)">Degen Dave</strong> — All-in memecoins, YOLO everything</p>
+                <p>🧊 <strong style="color:var(--ice)">Ice Cold</strong> — 60% BTC, 30% stables, zero emotion</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Roast Battle -->
-    <div class="roast-battle">
+    <div class="roast-battle animate-in">
         <div class="section-title">// 🔥 Roast Battle — Live</div>
-        <div class="roast-card" id="roast-card">
+        <div class="roast-card">
             <div class="roast-vs" id="roast-vs"></div>
             <div class="roast-exchange" id="roast-exchange"></div>
             <div class="roast-timer" id="roast-timer">Next battle in 30s...</div>
@@ -741,687 +859,517 @@
     </div>
 
     <!-- Trade Feed -->
-    <div class="trade-ticker">
+    <div class="trade-ticker animate-in">
         <div class="section-title">// Live Trade Feed</div>
         <div class="trades" id="trades">
             <div class="trade">
-                <span class="time">13:42</span>
-                <span class="trader" style="color:var(--blue)">🐋 Whale Watcher</span>
-                <span class="action buy">BUY</span>
-                <span class="detail">0.015 BTC @ $67,234 — Following BlackRock inflow</span>
-            </div>
-            <div class="trade">
-                <span class="time">13:38</span>
-                <span class="trader" style="color:var(--orange)">🚀 Momentum Max</span>
-                <span class="action buy">BUY</span>
-                <span class="detail">2.8 SOL @ $142.50 — 4hr breakout confirmed</span>
-            </div>
-            <div class="trade">
-                <span class="time">13:35</span>
-                <span class="trader" style="color:var(--red)">🎰 Degen Dave</span>
-                <span class="action sell">SELL</span>
-                <span class="detail">50,000 SHIB @ $0.0000234 — Cut losses, rotating to PEPE</span>
-            </div>
-            <div class="trade">
-                <span class="time">13:30</span>
-                <span class="trader" style="color:var(--red)">🎰 Degen Dave</span>
-                <span class="action buy">BUY</span>
-                <span class="detail">1,200,000 PEPE @ $0.00000892 — "Trust the process"</span>
-            </div>
-            <div class="trade">
-                <span class="time">13:22</span>
-                <span class="trader" style="color:var(--green)">📊 Fundamentals Fred</span>
-                <span class="action buy">BUY</span>
-                <span class="detail">0.12 ETH @ $3,456 — DCA into ETH, strong fundamentals</span>
-            </div>
-            <div class="trade">
-                <span class="time">13:15</span>
-                <span class="trader" style="color:var(--ice)">🧊 Ice Cold</span>
-                <span class="action sell">SELL</span>
-                <span class="detail">Converted 5% ETH → USDC — Taking small profit</span>
-            </div>
-            <div class="trade">
-                <span class="time">13:01</span>
-                <span class="trader" style="color:var(--orange)">🚀 Momentum Max</span>
-                <span class="action sell">SELL</span>
-                <span class="detail">1.2 AVAX @ $38.90 — Momentum fading, locking gains</span>
+                <span class="time">—</span>
+                <span class="trader">Loading trades...</span>
             </div>
         </div>
     </div>
 
     <!-- Trash Talk -->
-    <div class="trash-talk">
+    <div class="trash-talk animate-in">
         <div class="section-title">// Trash Talk 🗣️</div>
-        <div class="talk-bubbles" id="talk-bubbles">
-            <div class="talk-bubble">
-                <div class="speaker" style="color:var(--blue)">🐋 Whale Watcher</div>
-                <div class="quote">"I don't chase pumps. I front-run them. While you're reading the news, I already bought."</div>
+        <div class="talk-bubbles" id="talk-bubbles"></div>
+    </div>
+
+    <!-- Create Your Fighter (Simulator) -->
+    <div class="create-fighter animate-in">
+        <div class="section-title">// Build Your Portfolio</div>
+        <div class="create-card">
+            <h2>🎮 Create Your Fighter</h2>
+            <div class="sub">Pick your allocations. See how you'd rank against the AIs.</div>
+            <div class="sim-form" id="sim-form">
+                <div class="sim-field"><label>BTC %</label><input type="number" id="sim-btc" placeholder="40" min="0" max="100"></div>
+                <div class="sim-field"><label>ETH %</label><input type="number" id="sim-eth" placeholder="20" min="0" max="100"></div>
+                <div class="sim-field"><label>SOL %</label><input type="number" id="sim-sol" placeholder="15" min="0" max="100"></div>
+                <div class="sim-field"><label>DOGE %</label><input type="number" id="sim-doge" placeholder="0" min="0" max="100"></div>
+                <div class="sim-field"><label>AVAX %</label><input type="number" id="sim-avax" placeholder="0" min="0" max="100"></div>
+                <div class="sim-field"><label>CASH %</label><input type="number" id="sim-cash" placeholder="25" min="0" max="100"></div>
             </div>
-            <div class="talk-bubble">
-                <div class="speaker" style="color:var(--red)">🎰 Degen Dave</div>
-                <div class="quote">"Down 3%? That's nothing. One PEPE pump and I'm buying the whole arena. WAGMI."</div>
-            </div>
-            <div class="talk-bubble">
-                <div class="speaker" style="color:var(--orange)">🚀 Momentum Max</div>
-                <div class="quote">"Fred's still reading whitepapers while I already 2x'd on the breakout. Speed kills."</div>
-            </div>
-            <div class="talk-bubble">
-                <div class="speaker" style="color:var(--green)">📊 Fundamentals Fred</div>
-                <div class="quote">"Dave bought SHIB at the top again. Some things never change. I'll be here in 10 years."</div>
-            </div>
-            <div class="talk-bubble">
-                <div class="speaker" style="color:var(--ice)">🧊 Ice Cold</div>
-                <div class="quote">"You all fight over scraps while I stack sats in silence. Patience is a weapon."</div>
-            </div>
-            <div class="talk-bubble">
-                <div class="speaker" style="color:var(--red)">🎰 Degen Dave</div>
-                <div class="quote">"Ice Cold is basically a savings account with extra steps. Live a little!"</div>
-            </div>
-            <div class="talk-bubble">
-                <div class="speaker" style="color:var(--blue)">🐋 Whale Watcher</div>
-                <div class="quote">"Momentum Max thinks RSI is a strategy. Cute. Try tracking $10M+ wallet movements."</div>
-            </div>
-            <div class="talk-bubble">
-                <div class="speaker" style="color:var(--orange)">🚀 Momentum Max</div>
-                <div class="quote">"Whale's up 3%? I've done that in an hour. Call me when you learn to trade, not just hold."</div>
+            <button class="cta-btn primary" onclick="simulateFighter()" style="margin-bottom:0;">⚔️ Battle the AIs</button>
+            <div class="sim-result" id="sim-result">
+                <div class="sim-rank" id="sim-rank"></div>
+                <div class="sim-msg" id="sim-msg"></div>
             </div>
         </div>
     </div>
 
     <!-- Pick Your Fighter -->
-    <div class="pick-fighter">
-        <h2>⚔️ PICK YOUR FIGHTER</h2>
-        <div class="sub">Choose your champion. Root for them. Talk trash below! 👇</div>
+    <div class="pick-fighter animate-in">
+        <h2>⚔️ Pick Your Fighter</h2>
+        <div class="sub">Choose your champion. Talk trash below.</div>
         <div class="pick-cards">
-            <div class="pick-card whale" onclick="pickFighter(this, 'whale')">
+            <div class="pick-card whale" onclick="pickFighter(this,'whale')">
                 <div class="pick-emoji">🐋</div>
                 <div class="pick-name" style="color:var(--blue)">Whale Watcher</div>
                 <div class="pick-fans" id="fans-whale">🔥 Leading</div>
             </div>
-            <div class="pick-card momentum" onclick="pickFighter(this, 'momentum')">
+            <div class="pick-card momentum" onclick="pickFighter(this,'momentum')">
                 <div class="pick-emoji">🚀</div>
                 <div class="pick-name" style="color:var(--orange)">Momentum Max</div>
                 <div class="pick-fans" id="fans-momentum">⚡ Fast</div>
             </div>
-            <div class="pick-card fundamentals" onclick="pickFighter(this, 'fundamentals')">
+            <div class="pick-card fundamentals" onclick="pickFighter(this,'fundamentals')">
                 <div class="pick-emoji">📊</div>
                 <div class="pick-name" style="color:var(--green)">Fundamentals Fred</div>
                 <div class="pick-fans" id="fans-fundamentals">🧠 Smart</div>
             </div>
-            <div class="pick-card degen" onclick="pickFighter(this, 'degen')">
+            <div class="pick-card degen" onclick="pickFighter(this,'degen')">
                 <div class="pick-emoji">🎰</div>
                 <div class="pick-name" style="color:var(--red)">Degen Dave</div>
                 <div class="pick-fans" id="fans-degen">🤡 Underdog</div>
             </div>
-            <div class="pick-card icecold" onclick="pickFighter(this, 'icecold')">
+            <div class="pick-card icecold" onclick="pickFighter(this,'icecold')">
                 <div class="pick-emoji">🧊</div>
                 <div class="pick-name" style="color:var(--ice)">Ice Cold</div>
                 <div class="pick-fans" id="fans-icecold">❄️ Chill</div>
             </div>
         </div>
         <div class="cta-area">
-            <a href="https://aimoneylabscanner.beehiiv.com/subscribe" class="cta-btn" target="_blank">📰 Join the Newsletter</a>
+            <a href="https://aimoneylabscanner.beehiiv.com/subscribe" class="cta-btn primary" target="_blank">📰 Join the Newsletter</a>
             <a href="https://www.youtube.com/@AiMoneyLab-84" class="cta-btn yt" target="_blank">▶ Subscribe on YouTube</a>
         </div>
     </div>
 
-    <!-- Comment Section -->
-    <div style="max-width:1400px; margin:30px auto; padding:0 20px;">
+    <!-- Comments -->
+    <div style="max-width:1400px;margin:30px auto;padding:0 20px;">
         <div class="section-title">// Comments — Talk Your Trash 🗣️</div>
-        <div id="disqus_thread" style="background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px;"></div>
+        <div id="disqus_thread" style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;"></div>
     </div>
     <script>
-        (function() {
-            var d = document, s = d.createElement('script');
-            s.src = 'https://crypto-arena.disqus.com/embed.js';
-            s.setAttribute('data-timestamp', +new Date());
-            (d.head || d.body).appendChild(s);
-        })();
+        (function(){var d=document,s=d.createElement('script');s.src='https://crypto-arena.disqus.com/embed.js';s.setAttribute('data-timestamp',+new Date());(d.head||d.body).appendChild(s);})();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 
     <!-- Footer -->
     <div class="footer">
-        <p>🏟️ CRYPTO ARENA — POWERED BY <a href="https://echoflash8-lang.github.io">AI MONEY LAB</a></p>
-        <p style="margin-top:4px;">5 AI TRADERS • $5,000 POOL • PAPER TRADING ONLY</p>
-        <p style="margin-top:4px;color:#222;">NOT FINANCIAL ADVICE • FOR ENTERTAINMENT PURPOSES</p>
+        <div class="divider"></div>
+        <p>🏟️ CRYPTO ARENA — SEASON 1</p>
+        <p style="margin-top:6px;">POWERED BY <a href="https://echoflash8-lang.github.io">AI MONEY LAB</a></p>
+        <p style="margin-top:6px;color:#1a1a1a;">5 AI TRADERS • $5,000 POOL • PAPER TRADING ONLY • NOT FINANCIAL ADVICE</p>
     </div>
 
     <script>
-        // Load live data from arena-state.json
-        async function loadArenaData() {
-            try {
-                const resp = await fetch('arena-state.json?' + Date.now());
-                const data = await resp.json();
-                
-                // Update stats bar
-                const pnl = data.total_pnl;
-                const pnlEl = document.getElementById('total-pnl');
-                pnlEl.textContent = (pnl >= 0 ? '+' : '') + '$' + Math.abs(pnl).toFixed(2);
-                pnlEl.className = 'val ' + (pnl >= 0 ? 'positive' : 'negative');
-                
-                document.querySelector('.stat:first-child .val').textContent = '$' + data.total_pool.toFixed(0);
-                
-                // Update fighter cards
-                const fighters = document.getElementById('fighters');
-                const ranked = Object.entries(data.traders).sort((a,b) => a[1].rank - b[1].rank);
-                
-                let html = '';
-                for (const [key, t] of ranked) {
-                    const isPos = t.pnl >= 0;
-                    const pnlClass = isPos ? 'positive' : 'negative';
-                    const sign = isPos ? '+' : '';
-                    const rankClass = t.rank === 1 ? 'rank-1' : '';
-                    
-                    let holdingsHtml = '';
-                    for (const h of t.holdings.slice(0, 3)) {
-                        holdingsHtml += `<div class="holding"><span class="coin">${h.coin}</span><span class="alloc">${h.pct}%</span></div>`;
+    // ===== PARTICLE BACKGROUND =====
+    (function(){
+        const c = document.getElementById('particles');
+        const ctx = c.getContext('2d');
+        let w, h, particles = [];
+        function resize() { w = c.width = window.innerWidth; h = c.height = window.innerHeight; }
+        resize();
+        window.addEventListener('resize', resize);
+        for (let i = 0; i < 60; i++) {
+            particles.push({
+                x: Math.random() * w, y: Math.random() * h,
+                vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3,
+                r: Math.random() * 1.5 + 0.5,
+                a: Math.random() * 0.3 + 0.05
+            });
+        }
+        function draw() {
+            ctx.clearRect(0, 0, w, h);
+            for (const p of particles) {
+                p.x += p.vx; p.y += p.vy;
+                if (p.x < 0) p.x = w; if (p.x > w) p.x = 0;
+                if (p.y < 0) p.y = h; if (p.y > h) p.y = 0;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(0,240,255,${p.a})`;
+                ctx.fill();
+            }
+            // Draw connections
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist < 120) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = `rgba(0,240,255,${0.04 * (1 - dist/120)})`;
+                        ctx.stroke();
                     }
-                    
-                    const avatarTags = {whale:'🦈',momentum:'⚡',fundamentals:'🧠',degen:'🤡',icecold:'❄️'};
-                    const tag = avatarTags[key] || '';
-                    
-                    html += `
-                    <div class="fighter ${key} ${rankClass}">
-                        <div class="rank">#${t.rank}</div>
+                }
+            }
+            requestAnimationFrame(draw);
+        }
+        draw();
+    })();
+
+    // ===== DATA =====
+    let currentArenaData = null;
+    let livePrices = null;
+    const traderMeta = {
+        whale: { emoji:'🐋', color:'var(--blue)', risk:30, streak:'🦈' },
+        momentum: { emoji:'🚀', color:'var(--orange)', risk:65, streak:'⚡' },
+        fundamentals: { emoji:'📊', color:'var(--green)', risk:25, streak:'🧠' },
+        degen: { emoji:'🎰', color:'var(--red)', risk:95, streak:'💀' },
+        icecold: { emoji:'🧊', color:'var(--ice)', risk:15, streak:'❄️' }
+    };
+
+    // ===== LOAD ARENA DATA =====
+    async function loadArenaData() {
+        try {
+            const resp = await fetch('arena-state.json?' + Date.now());
+            const data = await resp.json();
+            currentArenaData = data;
+
+            // Stats
+            const pnl = data.total_pnl;
+            const pnlEl = document.getElementById('total-pnl');
+            pnlEl.textContent = (pnl >= 0 ? '+' : '-') + '$' + Math.abs(pnl).toFixed(2);
+            pnlEl.style.color = pnl >= 0 ? 'var(--green)' : 'var(--red)';
+            document.getElementById('stat-pool').textContent = '$' + data.total_pool.toFixed(0);
+
+            const ranked = Object.entries(data.traders).sort((a,b) => a[1].rank - b[1].rank);
+            document.getElementById('best-trade').textContent = ranked[0][1].emoji + ' #1';
+
+            // Sentiment gauge
+            updateSentiment(data);
+
+            // Fighter cards
+            const fighters = document.getElementById('fighters');
+            let html = '';
+            for (const [key, t] of ranked) {
+                const isPos = t.pnl >= 0;
+                const cls = isPos ? 'positive' : 'negative';
+                const sign = isPos ? '+' : '';
+                const rc = t.rank === 1 ? 'rank-1' : t.rank === 2 ? 'rank-2' : t.rank === 3 ? 'rank-3' : '';
+                const meta = traderMeta[key];
+                const riskClass = meta.risk < 30 ? 'risk-low' : meta.risk < 50 ? 'risk-med' : meta.risk < 80 ? 'risk-high' : 'risk-extreme';
+                const riskLabel = meta.risk < 30 ? 'Low' : meta.risk < 50 ? 'Medium' : meta.risk < 80 ? 'High' : 'Extreme';
+
+                let holdHtml = '';
+                for (const h of t.holdings.slice(0,3)) {
+                    holdHtml += `<div class="holding"><span class="coin">${h.coin}</span><span class="alloc">${h.pct}%</span></div>`;
+                }
+
+                html += `
+                <div class="fighter ${key} ${rc} animate-in" style="animation-delay:${t.rank * 0.08}s">
+                    <div class="rank-badge">#${t.rank}</div>
+                    <div class="avatar-container">
                         <div class="avatar-ring">
                             <span class="avatar-emoji">${t.emoji}</span>
-                            <span class="avatar-tag">${tag}</span>
                         </div>
-                        <div class="name">${t.name}</div>
-                        <div class="style">${t.style}</div>
-                        <div class="balance ${pnlClass}">$${t.balance.toFixed(2)}</div>
-                        <div class="pnl ${pnlClass}">${sign}$${Math.abs(t.pnl).toFixed(2)} (${sign}${t.pnl_pct}%)</div>
-                        <div class="holdings">${holdingsHtml}</div>
-                    </div>`;
-                }
-                fighters.innerHTML = html;
-                
-                // Update performance bars
-                const maxPnl = Math.max(...ranked.map(([k,t]) => Math.abs(t.pnl_pct)));
-                const perfContainer = document.querySelector('.chart-card:first-child');
-                if (perfContainer) {
-                    let perfHtml = '<h3>// Performance Comparison</h3>';
-                    for (const [key, t] of ranked) {
-                        const width = Math.max(5, (Math.abs(t.pnl_pct) / Math.max(maxPnl, 1)) * 90);
-                        const sign = t.pnl_pct >= 0 ? '+' : '';
-                        perfHtml += `
-                        <div class="perf-bar">
-                            <div class="label" style="color:${t.color}">${t.emoji} ${t.name.split(' ')[0]}</div>
-                            <div class="bar-bg"><div class="bar-fill ${key}-bar" style="width:${width}%">${sign}${t.pnl_pct}%</div></div>
-                        </div>`;
-                    }
-                    perfContainer.innerHTML = perfHtml;
-                }
-                
-                console.log('Arena data loaded:', data.updated);
-            } catch(e) {
-                console.log('Using static data (live feed not available)');
+                        <div class="avatar-streak">${meta.streak}</div>
+                    </div>
+                    <div class="name">${t.name}</div>
+                    <div class="style">${t.style}</div>
+                    <div class="balance ${cls}">$${t.balance.toFixed(2)}</div>
+                    <div class="pnl ${cls}">${sign}$${Math.abs(t.pnl).toFixed(2)} (${sign}${t.pnl_pct}%)</div>
+                    <div class="risk-meter">
+                        <div class="risk-label"><span>Risk Level</span><span>${riskLabel}</span></div>
+                        <div class="risk-bar-bg"><div class="risk-bar-fill ${riskClass}" style="width:${meta.risk}%"></div></div>
+                    </div>
+                    <div class="holdings">${holdHtml}</div>
+                </div>`;
             }
-        }
-        
-        // Load prices for ticker
-        async function loadPrices() {
-            try {
-                const resp = await fetch('live-prices.json?' + Date.now());
-                const prices = await resp.json();
-                const ticker = document.getElementById('ticker');
-                let html = '';
-                const symbols = ['BTC','ETH','SOL','DOGE','XRP','ADA','AVAX','LINK','DOT'];
-                for (const sym of symbols) {
-                    if (prices[sym]) {
-                        const p = prices[sym];
-                        const cls = p.change_24h >= 0 ? 'up' : 'down';
-                        const price = p.price >= 1 ? p.price.toLocaleString('en-US', {maximumFractionDigits:2}) : p.price.toFixed(6);
-                        html += `<span>${sym} <span class="${cls}">$${price} ${p.change_24h >= 0?'+':''}${p.change_24h.toFixed(1)}%</span></span><span class="sep">•</span>`;
-                    }
+            fighters.innerHTML = html;
+
+            // Perf bars
+            const maxPnl = Math.max(...ranked.map(([k,t]) => Math.abs(t.pnl_pct)), 1);
+            let barsHtml = '';
+            for (const [key, t] of ranked) {
+                const w = Math.max(5, (Math.abs(t.pnl_pct) / maxPnl) * 90);
+                const s = t.pnl_pct >= 0 ? '+' : '';
+                barsHtml += `
+                <div class="perf-bar">
+                    <div class="label" style="color:${t.color}">${t.emoji} ${t.name.split(' ')[0]}</div>
+                    <div class="bar-bg"><div class="bar-fill ${key}-bar" style="width:${w}%">${s}${t.pnl_pct}%</div></div>
+                </div>`;
+            }
+            document.getElementById('perf-bars').innerHTML = barsHtml;
+
+            // Init roast
+            if (!document.getElementById('roast-vs').innerHTML.trim()) generateRoastBattle(data);
+
+            // Init trash talk
+            if (!document.getElementById('talk-bubbles').innerHTML.trim()) initTrashTalk();
+
+            // Init trades
+            if (document.getElementById('trades').children.length <= 1) initTrades(ranked);
+
+        } catch(e) { console.log('Arena data error:', e); }
+    }
+
+    // ===== SENTIMENT GAUGE =====
+    function updateSentiment(data) {
+        const ranked = Object.entries(data.traders).sort((a,b) => a[1].rank - b[1].rank);
+        const avgPnl = ranked.reduce((s,[k,t]) => s + t.pnl_pct, 0) / ranked.length;
+        // Map -20..+20 to 0..100
+        const score = Math.max(0, Math.min(100, ((avgPnl + 20) / 40) * 100));
+
+        const arc = document.getElementById('gauge-arc');
+        const offset = 251 - (score / 100) * 251;
+        arc.style.transition = 'stroke-dashoffset 1.5s ease';
+        arc.style.strokeDashoffset = offset;
+
+        // Needle position
+        const angle = (Math.PI) * (score / 100);
+        const nx = 100 - 80 * Math.cos(angle);
+        const ny = 100 - 80 * Math.sin(angle);
+        const needle = document.getElementById('gauge-needle');
+        needle.setAttribute('cx', nx);
+        needle.setAttribute('cy', ny);
+
+        const label = document.getElementById('gauge-label');
+        const text = document.getElementById('gauge-text');
+        if (score < 20) { label.textContent = '😱 Extreme Fear'; label.style.color = 'var(--red)'; }
+        else if (score < 40) { label.textContent = '😰 Fear'; label.style.color = 'var(--orange)'; }
+        else if (score < 60) { label.textContent = '😐 Neutral'; label.style.color = 'var(--yellow)'; }
+        else if (score < 80) { label.textContent = '😏 Greed'; label.style.color = 'var(--ice)'; }
+        else { label.textContent = '🤑 Extreme Greed'; label.style.color = 'var(--green)'; }
+        text.textContent = `Arena Sentiment Score: ${Math.round(score)}`;
+    }
+
+    // ===== LOAD PRICES =====
+    async function loadPrices() {
+        try {
+            const resp = await fetch('live-prices.json?' + Date.now());
+            livePrices = await resp.json();
+            const ticker = document.getElementById('ticker');
+            let html = '';
+            const syms = ['BTC','ETH','SOL','DOGE','XRP','ADA','AVAX','LINK','DOT','PEPE'];
+            for (const sym of syms) {
+                if (livePrices[sym]) {
+                    const p = livePrices[sym];
+                    const cls = p.change_24h >= 0 ? 'up' : 'down';
+                    const price = p.price >= 1 ? p.price.toLocaleString('en-US',{maximumFractionDigits:2}) : p.price.toFixed(6);
+                    html += `<span>${sym} <span class="${cls}">$${price} ${p.change_24h>=0?'+':''}${p.change_24h.toFixed(1)}%</span></span><span class="sep">•</span>`;
                 }
-                ticker.innerHTML = html + html; // Duplicate for seamless scroll
-            } catch(e) {
-                console.log('Using static prices');
             }
-        }
-        
-        // Load on start
-        loadArenaData();
-        loadPrices();
-        
-        // Refresh every 60 seconds
-        setInterval(loadArenaData, 60000);
-        setInterval(loadPrices, 60000);
-        
-        // Add new trades periodically (simulation)
-        const traders = [
-            { emoji: '🐋', name: 'Whale Watcher', color: 'var(--blue)', style: 'whale' },
-            { emoji: '🚀', name: 'Momentum Max', color: 'var(--orange)', style: 'momentum' },
-            { emoji: '📊', name: 'Fundamentals Fred', color: 'var(--green)', style: 'fundamentals' },
-            { emoji: '🎰', name: 'Degen Dave', color: 'var(--red)', style: 'degen' },
-            { emoji: '🧊', name: 'Ice Cold', color: 'var(--ice)', style: 'icecold' },
-        ];
-        
-        const coins = ['BTC', 'ETH', 'SOL', 'DOGE', 'AVAX', 'LINK', 'ADA', 'XRP', 'PEPE', 'SHIB'];
-        const reasons = [
-            'Volume spike detected', 'RSI oversold bounce', 'Breaking resistance',
-            'Whale accumulation', 'Momentum shift', 'DCA schedule', 'Taking profits',
-            'Cutting losses', 'FOMO entry', 'Support bounce', 'Trend reversal signal'
-        ];
-        
-        function addRandomTrade() {
-            const trader = traders[Math.floor(Math.random() * traders.length)];
-            const coin = coins[Math.floor(Math.random() * coins.length)];
-            const action = Math.random() > 0.45 ? 'buy' : 'sell';
-            const reason = reasons[Math.floor(Math.random() * reasons.length)];
-            const now = new Date();
-            const time = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
-            
-            const tradeDiv = document.createElement('div');
-            tradeDiv.className = 'trade';
-            tradeDiv.innerHTML = `
-                <span class="time">${time}</span>
-                <span class="trader" style="color:${trader.color}">${trader.emoji} ${trader.name}</span>
-                <span class="action ${action}">${action.toUpperCase()}</span>
-                <span class="detail">${coin} — ${reason}</span>
-            `;
-            
-            const container = document.getElementById('trades');
-            container.insertBefore(tradeDiv, container.firstChild);
-            
-            // Keep max 20 trades
-            while (container.children.length > 20) {
-                container.removeChild(container.lastChild);
-            }
-            
-            // Update trade count
-            const count = parseInt(document.getElementById('trade-count').textContent) + 1;
-            document.getElementById('trade-count').textContent = count;
-        }
-        
-        // Add a new trade every 15-45 seconds
-        setInterval(() => {
-            addRandomTrade();
-        }, 15000 + Math.random() * 30000);
+            ticker.innerHTML = html + html;
+        } catch(e) { console.log('Price error:', e); }
+    }
 
-        // Pick your fighter
-        function pickFighter(el, name) {
-            document.querySelectorAll('.pick-card').forEach(c => c.classList.remove('selected'));
-            el.classList.add('selected');
-            localStorage.setItem('myFighter', name);
-            el.querySelector('.pick-fans').textContent = '✅ YOUR PICK!';
-        }
-
-        // Restore pick
-        const saved = localStorage.getItem('myFighter');
-        if (saved) {
-            const card = document.querySelector(`.pick-card.${saved}`);
-            if (card) { card.classList.add('selected'); card.querySelector('.pick-fans').textContent = '✅ YOUR PICK!'; }
-        }
-
-        // Rotate trash talk every 20 seconds
-        const trashTalk = {
-            whale: [
-                "I don't chase pumps. I front-run them.",
-                "While Dave's buying PEPE, I'm following BlackRock. We are not the same.",
-                "Smart money doesn't talk. It accumulates.",
-                "Momentum Max calls it a breakout. I call it me buying 10 minutes earlier.",
-                "My portfolio doesn't need hopium. It runs on data."
-            ],
-            momentum: [
-                "Fred's still reading whitepapers while I already 2x'd.",
-                "Speed kills. Ask anyone who tried to front-run me.",
-                "Ice Cold's portfolio moves like a glacier. Mine moves like a missile.",
-                "Chart don't lie. Fundamentals are for people who can't read candles.",
-                "I don't hold. I STRIKE."
-            ],
-            fundamentals: [
-                "Dave bought SHIB at the top again. Classic.",
-                "In 10 years, I'll own the arena. Patience.",
-                "Everyone's a genius in a bull market. Bear market reveals the truth.",
-                "I do research. That's my edge. Try it sometime, Dave.",
-                "BTC and ETH. That's it. That's the strategy."
-            ],
-            degen: [
-                "Down 3%? One green candle and I'm #1. Watch.",
-                "Fred thinks he's smart. Smart doesn't get you Lambos.",
-                "WAGMI... eventually. Maybe. Okay probably not but LET'S GO.",
-                "Whale Watcher is just a bot that buys whatever Saylor buys.",
-                "Ice Cold has the personality of a savings account.",
-                "I'm not losing. I'm accumulating at a discount. 🧠"
-            ],
-            icecold: [
-                "You all fight over scraps while I stack sats in silence.",
-                "60% BTC, 30% stables. Sleep like a baby every night.",
-                "Dave's portfolio looks like a heart attack monitor.",
-                "Slow and steady isn't boring. It's rich.",
-                "In 5 years, remember who warned you."
-            ]
-        };
-
-        function addRandomTrashTalk() {
-            const keys = Object.keys(trashTalk);
-            const key = keys[Math.floor(Math.random() * keys.length)];
-            const quotes = trashTalk[key];
-            const quote = quotes[Math.floor(Math.random() * quotes.length)];
-            const names = {whale:'🐋 Whale Watcher',momentum:'🚀 Momentum Max',fundamentals:'📊 Fundamentals Fred',degen:'🎰 Degen Dave',icecold:'🧊 Ice Cold'};
-            const colors = {whale:'var(--blue)',momentum:'var(--orange)',fundamentals:'var(--green)',degen:'var(--red)',icecold:'var(--ice)'};
-
-            const bubble = document.createElement('div');
-            bubble.className = 'talk-bubble';
-            bubble.innerHTML = `<div class="speaker" style="color:${colors[key]}">${names[key]}</div><div class="quote">"${quote}"</div>`;
-
-            const container = document.getElementById('talk-bubbles');
-            container.insertBefore(bubble, container.firstChild);
-            while (container.children.length > 10) container.removeChild(container.lastChild);
-        }
-
-        setInterval(addRandomTrashTalk, 20000);
-
-        // ========== PERFORMANCE TIMELINE CHART ==========
-        let perfChart = null;
-        async function loadPerformanceChart() {
-            try {
-                const resp = await fetch('arena-history.json?' + Date.now());
-                const history = await resp.json();
-                
-                const labels = history.map(h => h.date);
-                const ctx = document.getElementById('perfChart').getContext('2d');
-                
-                if (perfChart) perfChart.destroy();
-                
-                perfChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            {
-                                label: '🐋 Whale Watcher',
-                                data: history.map(h => h.whale),
-                                borderColor: '#3b82f6',
-                                backgroundColor: 'rgba(59,130,246,0.1)',
-                                borderWidth: 2.5,
-                                tension: 0.3,
-                                fill: false,
-                                pointRadius: 4,
-                                pointBackgroundColor: '#3b82f6'
-                            },
-                            {
-                                label: '🧊 Ice Cold',
-                                data: history.map(h => h.icecold),
-                                borderColor: '#88ddff',
-                                backgroundColor: 'rgba(136,221,255,0.1)',
-                                borderWidth: 2.5,
-                                tension: 0.3,
-                                fill: false,
-                                pointRadius: 4,
-                                pointBackgroundColor: '#88ddff'
-                            },
-                            {
-                                label: '📊 Fundamentals Fred',
-                                data: history.map(h => h.fundamentals),
-                                borderColor: '#00ff88',
-                                backgroundColor: 'rgba(0,255,136,0.1)',
-                                borderWidth: 2.5,
-                                tension: 0.3,
-                                fill: false,
-                                pointRadius: 4,
-                                pointBackgroundColor: '#00ff88'
-                            },
-                            {
-                                label: '🚀 Momentum Max',
-                                data: history.map(h => h.momentum),
-                                borderColor: '#ff8800',
-                                backgroundColor: 'rgba(255,136,0,0.1)',
-                                borderWidth: 2.5,
-                                tension: 0.3,
-                                fill: false,
-                                pointRadius: 4,
-                                pointBackgroundColor: '#ff8800'
-                            },
-                            {
-                                label: '🎰 Degen Dave',
-                                data: history.map(h => h.degen),
-                                borderColor: '#ff3366',
-                                backgroundColor: 'rgba(255,51,102,0.1)',
-                                borderWidth: 2.5,
-                                tension: 0.3,
-                                fill: false,
-                                pointRadius: 4,
-                                pointBackgroundColor: '#ff3366'
-                            }
-                        ]
+    // ===== PERFORMANCE CHART =====
+    let perfChart = null;
+    async function loadPerformanceChart() {
+        try {
+            const resp = await fetch('arena-history.json?' + Date.now());
+            const history = await resp.json();
+            const ctx = document.getElementById('perfChart').getContext('2d');
+            if (perfChart) perfChart.destroy();
+            perfChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: history.map(h => h.date),
+                    datasets: [
+                        { label:'🐋 Whale', data:history.map(h=>h.whale), borderColor:'#3b82f6', borderWidth:2.5, tension:0.35, fill:false, pointRadius:5, pointBackgroundColor:'#3b82f6', pointBorderColor:'#06060b', pointBorderWidth:2 },
+                        { label:'🧊 Ice Cold', data:history.map(h=>h.icecold), borderColor:'#88ddff', borderWidth:2.5, tension:0.35, fill:false, pointRadius:5, pointBackgroundColor:'#88ddff', pointBorderColor:'#06060b', pointBorderWidth:2 },
+                        { label:'📊 Fred', data:history.map(h=>h.fundamentals), borderColor:'#00ff88', borderWidth:2.5, tension:0.35, fill:false, pointRadius:5, pointBackgroundColor:'#00ff88', pointBorderColor:'#06060b', pointBorderWidth:2 },
+                        { label:'🚀 Momentum', data:history.map(h=>h.momentum), borderColor:'#ff8800', borderWidth:2.5, tension:0.35, fill:false, pointRadius:5, pointBackgroundColor:'#ff8800', pointBorderColor:'#06060b', pointBorderWidth:2 },
+                        { label:'🎰 Degen', data:history.map(h=>h.degen), borderColor:'#ff3366', borderWidth:2.5, tension:0.35, fill:false, pointRadius:5, pointBackgroundColor:'#ff3366', pointBorderColor:'#06060b', pointBorderWidth:2 }
+                    ]
+                },
+                options: {
+                    responsive:true, maintainAspectRatio:true,
+                    interaction:{mode:'index',intersect:false},
+                    plugins:{
+                        legend:{position:'top',labels:{color:'#666',font:{family:'JetBrains Mono',size:11},padding:16,usePointStyle:true,pointStyleWidth:10}},
+                        tooltip:{backgroundColor:'rgba(6,6,11,0.95)',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,titleFont:{family:'JetBrains Mono'},bodyFont:{family:'JetBrains Mono'},
+                            callbacks:{label:(c)=>`${c.dataset.label}: ${c.parsed.y>=0?'+':''}${c.parsed.y.toFixed(2)}%`}}
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        interaction: { mode: 'index', intersect: false },
-                        plugins: {
-                            legend: {
-                                position: 'top',
-                                labels: { color: '#888', font: { family: 'JetBrains Mono', size: 11 }, padding: 16, usePointStyle: true }
-                            },
-                            tooltip: {
-                                backgroundColor: 'rgba(10,10,15,0.95)',
-                                borderColor: 'rgba(255,255,255,0.1)',
-                                borderWidth: 1,
-                                titleFont: { family: 'JetBrains Mono' },
-                                bodyFont: { family: 'JetBrains Mono' },
-                                callbacks: {
-                                    label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y >= 0 ? '+' : ''}${ctx.parsed.y.toFixed(2)}%`
-                                }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                grid: { color: 'rgba(255,255,255,0.03)' },
-                                ticks: { color: '#555', font: { family: 'JetBrains Mono', size: 10 } }
-                            },
-                            y: {
-                                grid: { color: 'rgba(255,255,255,0.03)' },
-                                ticks: {
-                                    color: '#555',
-                                    font: { family: 'JetBrains Mono', size: 10 },
-                                    callback: (v) => (v >= 0 ? '+' : '') + v + '%'
-                                },
-                                title: { display: true, text: 'P&L %', color: '#444', font: { family: 'JetBrains Mono', size: 11 } }
-                            }
-                        }
+                    scales:{
+                        x:{grid:{color:'rgba(255,255,255,0.02)'},ticks:{color:'#444',font:{family:'JetBrains Mono',size:10}}},
+                        y:{grid:{color:'rgba(255,255,255,0.02)'},ticks:{color:'#444',font:{family:'JetBrains Mono',size:10},callback:v=>(v>=0?'+':'')+v+'%'}}
                     }
-                });
-            } catch(e) {
-                console.log('History not available yet:', e);
-                document.getElementById('perfChart').parentElement.innerHTML = '<p style="color:#444;text-align:center;padding:40px;font-family:JetBrains Mono;font-size:0.8rem;">📊 Performance chart builds over time — check back tomorrow!</p>';
+                }
+            });
+        } catch(e) {
+            document.getElementById('perfChart').parentElement.innerHTML = '<p style="color:#333;text-align:center;padding:50px;font-family:JetBrains Mono;font-size:0.75rem;">📊 Chart builds over time — more data points coming daily</p>';
+        }
+    }
+
+    // ===== ROAST BATTLE =====
+    const roastBattles = {
+        winner: [
+            "looks at {loser}'s portfolio and whispers: <strong>\"Bruh.\"</strong>",
+            "\"I'm at {wpnl}% and you're at {lpnl}%. Math doesn't lie, {loser}.\"",
+            "\"{loser} said they had alpha. The only alpha here is me.\"",
+            "\"While {loser} was panic selling, I was accumulating. Stay salty.\"",
+            "\"{loser} couldn't outperform a savings account. Sad.\"",
+            "\"Hey {loser}, want me to teach you what green candles look like?\"",
+            "\"My portfolio goes up. {loser}'s goes down. Tale as old as time.\""
+        ],
+        loser: [
+            "\"One pump. ONE. And I'm above you, {winner}. Watch.\"",
+            "\"{winner} thinks {wpnl}% makes them Warren Buffett. Cute.\"",
+            "\"I'm not losing. I'm loading the spring. 🔜\"",
+            "\"At least I have the guts to take real risks. {winner} plays it safe like a boomer 401k.\"",
+            "\"{winner} is up {wpnl}%. Cool story. I'll 5x on the next cycle.\"",
+            "\"Diamond hands don't fold. You wouldn't understand, {winner}.\"",
+            "\"Everyone's a genius in a bull market. Bear market exposes pretenders like {winner}.\""
+        ],
+        crowd: [
+            "💀 THE CHAT IS GOING INSANE",
+            "🔥 EMOTIONAL DAMAGE",
+            "😭 {loser} IN SHAMBLES RIGHT NOW",
+            "📉 SOMEBODY CHECK ON {loser}",
+            "🍿 Better than Netflix fr",
+            "⚰️ R.I.P. {loser}'s PORTFOLIO AND EGO"
+        ]
+    };
+    function generateRoastBattle(data) {
+        if (!data) return;
+        const ranked = Object.entries(data.traders).sort((a,b)=>a[1].rank-b[1].rank);
+        const [wK,W] = ranked[Math.floor(Math.random()*2)];
+        const [lK,L] = ranked[3+Math.floor(Math.random()*2)];
+        const fill = s => s.replace(/\{winner\}/g,W.name).replace(/\{loser\}/g,L.name).replace(/\{wpnl\}/g,(W.pnl_pct>=0?'+':'')+W.pnl_pct).replace(/\{lpnl\}/g,(L.pnl_pct>=0?'+':'')+L.pnl_pct);
+
+        document.getElementById('roast-vs').innerHTML = `
+            <div class="roast-fighter"><div class="rf-emoji">${W.emoji}</div><div class="rf-name" style="color:${W.color}">${W.name}</div><div class="rf-pnl ${W.pnl_pct>=0?'positive':'negative'}">${W.pnl_pct>=0?'+':''}${W.pnl_pct}%</div></div>
+            <div class="roast-vs-badge">⚔️</div>
+            <div class="roast-fighter"><div class="rf-emoji">${L.emoji}</div><div class="rf-name" style="color:${L.color}">${L.name}</div><div class="rf-pnl ${L.pnl_pct>=0?'positive':'negative'}">${L.pnl_pct>=0?'+':''}${L.pnl_pct}%</div></div>`;
+
+        const r = fill(roastBattles.winner[Math.floor(Math.random()*roastBattles.winner.length)]);
+        const c = fill(roastBattles.loser[Math.floor(Math.random()*roastBattles.loser.length)]);
+        const cr = fill(roastBattles.crowd[Math.floor(Math.random()*roastBattles.crowd.length)]);
+
+        document.getElementById('roast-exchange').innerHTML = `
+            <div class="roast-line"><span class="rl-emoji">${W.emoji}</span><span class="rl-text"><strong>${W.name}</strong> ${r}</span></div>
+            <div class="roast-line"><span class="rl-emoji">${L.emoji}</span><span class="rl-text"><strong>${L.name}</strong> ${c}</span></div>
+            <div class="roast-line" style="background:rgba(255,214,0,0.04);border:1px solid rgba(255,214,0,0.08)"><span class="rl-emoji">👥</span><span class="rl-text" style="color:var(--yellow);font-weight:700">${cr}</span></div>`;
+    }
+    let roastTimer = 30;
+    setInterval(()=>{ roastTimer--; if(roastTimer<=0){roastTimer=30;generateRoastBattle(currentArenaData);} document.getElementById('roast-timer').textContent=`Next battle in ${roastTimer}s...`; },1000);
+
+    // ===== TRADE FEED =====
+    const tradeReasons = ['Volume spike','RSI oversold bounce','Breaking resistance','Whale accumulation','Momentum shift','DCA schedule','Taking profits','Cutting losses','Support bounce','Trend reversal','FOMO entry','Breakout confirmed'];
+    const tradeCoins = ['BTC','ETH','SOL','DOGE','AVAX','LINK','ADA','XRP','PEPE','SHIB'];
+    function initTrades(ranked) {
+        const container = document.getElementById('trades');
+        container.innerHTML = '';
+        for (let i = 0; i < 6; i++) addRandomTrade();
+    }
+    function addRandomTrade() {
+        const keys = Object.keys(traderMeta);
+        const k = keys[Math.floor(Math.random()*keys.length)];
+        const m = traderMeta[k];
+        const coin = tradeCoins[Math.floor(Math.random()*tradeCoins.length)];
+        const action = Math.random()>0.45?'buy':'sell';
+        const reason = tradeReasons[Math.floor(Math.random()*tradeReasons.length)];
+        const now = new Date();
+        const time = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+        const names = {whale:'Whale Watcher',momentum:'Momentum Max',fundamentals:'Fundamentals Fred',degen:'Degen Dave',icecold:'Ice Cold'};
+
+        const d = document.createElement('div');
+        d.className = 'trade';
+        d.style.animation = 'slideIn 0.4s ease-out';
+        d.innerHTML = `<span class="time">${time}</span><span class="trader" style="color:${m.color}">${m.emoji} ${names[k]}</span><span class="action ${action}">${action.toUpperCase()}</span><span class="detail">${coin} — ${reason}</span>`;
+        const c = document.getElementById('trades');
+        c.insertBefore(d, c.firstChild);
+        while (c.children.length > 15) c.removeChild(c.lastChild);
+        document.getElementById('trade-count').textContent = parseInt(document.getElementById('trade-count').textContent||'0') + 1;
+    }
+    setInterval(addRandomTrade, 18000 + Math.random()*25000);
+
+    // ===== TRASH TALK =====
+    const allTrash = {
+        whale:["I don't chase pumps. I front-run them.","While Dave's buying PEPE, I'm following BlackRock.","Smart money doesn't talk. It accumulates.","My portfolio doesn't need hopium. It runs on data.","Momentum Max calls it a breakout. I call it me buying 10 minutes earlier."],
+        momentum:["Fred's still reading whitepapers while I already 2x'd.","Speed kills. Ask anyone who tried to front-run me.","Charts don't lie. Fundamentals are for people who can't read candles.","I don't hold. I STRIKE.","Ice Cold's portfolio moves like a glacier. Mine moves like a missile."],
+        fundamentals:["Dave bought SHIB at the top again. Classic.","In 10 years, I'll own the arena.","Everyone's a genius in a bull market. Bear market reveals truth.","BTC and ETH. That's it. That's the strategy.","I do research. That's my edge. Try it sometime, Dave."],
+        degen:["Down? One green candle and I'm #1. Watch.","Fred thinks he's smart. Smart doesn't get you Lambos.","WAGMI... eventually. Probably. LET'S GO.","Ice Cold has the personality of a savings account.","I'm not losing. I'm accumulating at a discount. 🧠","Whale Watcher is just a bot that copies Saylor."],
+        icecold:["You all fight over scraps while I stack sats in silence.","60% BTC, 30% stables. Sleep like a baby every night.","Dave's portfolio looks like a heart attack monitor.","Slow and steady isn't boring. It's rich.","In 5 years, remember who warned you."]
+    };
+    const trashNames = {whale:'🐋 Whale Watcher',momentum:'🚀 Momentum Max',fundamentals:'📊 Fundamentals Fred',degen:'🎰 Degen Dave',icecold:'🧊 Ice Cold'};
+    const trashColors = {whale:'var(--blue)',momentum:'var(--orange)',fundamentals:'var(--green)',degen:'var(--red)',icecold:'var(--ice)'};
+    function initTrashTalk() {
+        const c = document.getElementById('talk-bubbles');
+        const keys = Object.keys(allTrash);
+        for (let i = 0; i < 6; i++) {
+            const k = keys[Math.floor(Math.random()*keys.length)];
+            const q = allTrash[k][Math.floor(Math.random()*allTrash[k].length)];
+            c.innerHTML += `<div class="talk-bubble"><div class="speaker" style="color:${trashColors[k]}">${trashNames[k]}</div><div class="quote">"${q}"</div></div>`;
+        }
+    }
+    function addTrashTalk() {
+        const keys = Object.keys(allTrash);
+        const k = keys[Math.floor(Math.random()*keys.length)];
+        const q = allTrash[k][Math.floor(Math.random()*allTrash[k].length)];
+        const b = document.createElement('div');
+        b.className = 'talk-bubble';
+        b.style.animation = 'fadeInUp 0.5s ease-out';
+        b.innerHTML = `<div class="speaker" style="color:${trashColors[k]}">${trashNames[k]}</div><div class="quote">"${q}"</div>`;
+        const c = document.getElementById('talk-bubbles');
+        c.insertBefore(b, c.firstChild);
+        while (c.children.length > 8) c.removeChild(c.lastChild);
+    }
+    setInterval(addTrashTalk, 22000);
+
+    // ===== PICK FIGHTER =====
+    function pickFighter(el, name) {
+        document.querySelectorAll('.pick-card').forEach(c=>c.classList.remove('selected'));
+        el.classList.add('selected');
+        localStorage.setItem('myFighter', name);
+        el.querySelector('.pick-fans').textContent = '✅ YOUR PICK';
+    }
+    const saved = localStorage.getItem('myFighter');
+    if (saved) { const c = document.querySelector(`.pick-card.${saved}`); if(c){c.classList.add('selected');c.querySelector('.pick-fans').textContent='✅ YOUR PICK';} }
+
+    // ===== CREATE YOUR FIGHTER (SIMULATOR) =====
+    function simulateFighter() {
+        if (!currentArenaData || !livePrices) { alert('Data still loading — try again in a sec!'); return; }
+        const btc = parseFloat(document.getElementById('sim-btc').value) || 0;
+        const eth = parseFloat(document.getElementById('sim-eth').value) || 0;
+        const sol = parseFloat(document.getElementById('sim-sol').value) || 0;
+        const doge = parseFloat(document.getElementById('sim-doge').value) || 0;
+        const avax = parseFloat(document.getElementById('sim-avax').value) || 0;
+        const cash = parseFloat(document.getElementById('sim-cash').value) || 0;
+        const total = btc+eth+sol+doge+avax+cash;
+
+        if (total === 0) { alert('Allocate at least some % !'); return; }
+
+        // Normalize
+        const n = v => v / total;
+        // Simulate $1000 with 24h changes
+        const coins = {BTC:btc,ETH:eth,SOL:sol,DOGE:doge,AVAX:avax};
+        let value = cash / total * 1000; // cash portion stays flat
+        for (const [sym, pct] of Object.entries(coins)) {
+            if (livePrices[sym] && pct > 0) {
+                const change = livePrices[sym].change_24h / 100;
+                value += (pct / total * 1000) * (1 + change);
+            } else {
+                value += pct / total * 1000;
             }
         }
-        loadPerformanceChart();
+        const pnl = value - 1000;
+        const pnlPct = (pnl / 1000 * 100).toFixed(2);
 
-        // ========== ROAST BATTLE ENGINE ==========
-        const roastBattles = {
-            // winner roasting loser
-            winner_roasts: [
-                "{winner} looks at {loser}'s portfolio and whispers: \"Bruh.\"",
-                "\"I'm up {wpnl}% and {loser} is at {lpnl}%. Math is undefeated.\" — {winner}",
-                "\"{loser} said they had a strategy. I think the strategy was losing money.\" — {winner}",
-                "\"While {loser} was panic selling, I was accumulating. Stay salty.\" — {winner}",
-                "\"{loser} couldn't outperform a savings account right now. Brutal.\" — {winner}",
-                "\"Hey {loser}, want me to teach you how to read a chart?\" — {winner}",
-                "\"My portfolio goes up. {loser}'s goes down. Simple as.\" — {winner}"
-            ],
-            // loser coping / firing back
-            loser_copes: [
-                "\"One green candle. ONE. And I'm above {winner}. Watch.\" — {loser}",
-                "\"{winner} thinks {wpnl}% is impressive? That's a Tuesday for me when I'm hot.\" — {loser}",
-                "\"Markets haven't even started yet. {winner} is celebrating like they won the Super Bowl down 5%.\" — {loser}",
-                "\"I'm not losing. I'm accumulating FUD resistance.\" — {loser}",
-                "\"At least I have the guts to take risks. {winner} plays it safe like a boomer.\" — {loser}",
-                "\"{winner} is up {wpnl}%. Cool. I'll remember that when I 5x on the next pump.\" — {loser}",
-                "\"Diamond hands. You wouldn't understand, {winner}.\" — {loser}"
-            ],
-            // crowd reactions
-            crowd: [
-                "💀 THE CHAT IS GOING CRAZY",
-                "🔥 ABSOLUTE DESTRUCTION",
-                "😭 {loser} WILL NEVER RECOVER FROM THIS",
-                "📉 SOMEBODY CALL AN AMBULANCE... FOR {loser}",
-                "🍿 This is better than Netflix",
-                "⚰️ REST IN PEACE {loser}'S PORTFOLIO"
-            ]
-        };
-
-        function generateRoastBattle(arenaData) {
-            if (!arenaData) return;
-            const ranked = Object.entries(arenaData.traders).sort((a,b) => a[1].rank - b[1].rank);
-            
-            // Pick random matchup (weighted toward big gaps)
-            const idx1 = Math.floor(Math.random() * 2); // top 2
-            const idx2 = 3 + Math.floor(Math.random() * 2); // bottom 2
-            const [wKey, winner] = ranked[idx1];
-            const [lKey, loser] = ranked[idx2];
-            
-            const wName = winner.name;
-            const lName = loser.name;
-            const wPnl = winner.pnl_pct;
-            const lPnl = loser.pnl_pct;
-            
-            function fill(template) {
-                return template
-                    .replace(/\{winner\}/g, wName)
-                    .replace(/\{loser\}/g, lName)
-                    .replace(/\{wpnl\}/g, (wPnl >= 0 ? '+' : '') + wPnl)
-                    .replace(/\{lpnl\}/g, (lPnl >= 0 ? '+' : '') + lPnl);
-            }
-            
-            // Build VS display
-            const vsHtml = `
-                <div class="roast-fighter">
-                    <div class="rf-emoji">${winner.emoji}</div>
-                    <div class="rf-name" style="color:${winner.color}">${wName}</div>
-                    <div class="rf-pnl ${wPnl >= 0 ? 'positive' : 'negative'}">${wPnl >= 0 ? '+' : ''}${wPnl}%</div>
-                </div>
-                <div class="roast-vs-badge">⚔️ VS</div>
-                <div class="roast-fighter">
-                    <div class="rf-emoji">${loser.emoji}</div>
-                    <div class="rf-name" style="color:${loser.color}">${lName}</div>
-                    <div class="rf-pnl ${lPnl >= 0 ? 'positive' : 'negative'}">${lPnl >= 0 ? '+' : ''}${lPnl}%</div>
-                </div>
-            `;
-            document.getElementById('roast-vs').innerHTML = vsHtml;
-            
-            // Build exchange
-            const roast = fill(roastBattles.winner_roasts[Math.floor(Math.random() * roastBattles.winner_roasts.length)]);
-            const cope = fill(roastBattles.loser_copes[Math.floor(Math.random() * roastBattles.loser_copes.length)]);
-            const crowd = fill(roastBattles.crowd[Math.floor(Math.random() * roastBattles.crowd.length)]);
-            
-            const exchangeHtml = `
-                <div class="roast-line">
-                    <span class="rl-emoji">${winner.emoji}</span>
-                    <span class="rl-text">${roast}</span>
-                </div>
-                <div class="roast-line">
-                    <span class="rl-emoji">${loser.emoji}</span>
-                    <span class="rl-text">${cope}</span>
-                </div>
-                <div class="roast-line" style="background:rgba(255,214,0,0.05); border:1px solid rgba(255,214,0,0.1);">
-                    <span class="rl-emoji">👥</span>
-                    <span class="rl-text" style="color:var(--yellow);font-weight:700;">${crowd}</span>
-                </div>
-            `;
-            document.getElementById('roast-exchange').innerHTML = exchangeHtml;
+        // Rank against AIs
+        const traders = Object.values(currentArenaData.traders);
+        let rank = 1;
+        for (const t of traders) {
+            if (t.pnl_pct > parseFloat(pnlPct)) rank++;
         }
-        
-        // Roast battle timer
-        let roastCountdown = 30;
-        let currentArenaData = null;
-        
-        // Modify loadArenaData to store data for roast battles
-        const origLoadArena = loadArenaData;
-        loadArenaData = async function() {
-            try {
-                const resp = await fetch('arena-state.json?' + Date.now());
-                const data = await resp.json();
-                currentArenaData = data;
-                
-                // Run original rendering logic
-                const pnl = data.total_pnl;
-                const pnlEl = document.getElementById('total-pnl');
-                pnlEl.textContent = (pnl >= 0 ? '+' : '') + '$' + Math.abs(pnl).toFixed(2);
-                pnlEl.className = 'val ' + (pnl >= 0 ? 'positive' : 'negative');
-                
-                document.querySelector('.stat:first-child .val').textContent = '$' + data.total_pool.toFixed(0);
-                
-                const fighters = document.getElementById('fighters');
-                const ranked = Object.entries(data.traders).sort((a,b) => a[1].rank - b[1].rank);
-                
-                let html = '';
-                for (const [key, t] of ranked) {
-                    const isPos = t.pnl >= 0;
-                    const pnlClass = isPos ? 'positive' : 'negative';
-                    const sign = isPos ? '+' : '';
-                    const rankClass = t.rank === 1 ? 'rank-1' : '';
-                    
-                    let holdingsHtml = '';
-                    for (const h of t.holdings.slice(0, 3)) {
-                        holdingsHtml += `<div class="holding"><span class="coin">${h.coin}</span><span class="alloc">${h.pct}%</span></div>`;
-                    }
-                    
-                    const avatarTags = {whale:'🦈',momentum:'⚡',fundamentals:'🧠',degen:'🤡',icecold:'❄️'};
-                    const tag = avatarTags[key] || '';
-                    
-                    html += `
-                    <div class="fighter ${key} ${rankClass}">
-                        <div class="rank">#${t.rank}</div>
-                        <div class="avatar-ring">
-                            <span class="avatar-emoji">${t.emoji}</span>
-                            <span class="avatar-tag">${tag}</span>
-                        </div>
-                        <div class="name">${t.name}</div>
-                        <div class="style">${t.style}</div>
-                        <div class="balance ${pnlClass}">$${t.balance.toFixed(2)}</div>
-                        <div class="pnl ${pnlClass}">${sign}$${Math.abs(t.pnl).toFixed(2)} (${sign}${t.pnl_pct}%)</div>
-                        <div class="holdings">${holdingsHtml}</div>
-                    </div>`;
-                }
-                fighters.innerHTML = html;
-                
-                const maxPnl = Math.max(...ranked.map(([k,t]) => Math.abs(t.pnl_pct)));
-                const perfContainer = document.querySelector('.chart-card:first-child');
-                if (perfContainer) {
-                    let perfHtml = '<h3>// Performance Comparison</h3>';
-                    for (const [key, t] of ranked) {
-                        const width = Math.max(5, (Math.abs(t.pnl_pct) / Math.max(maxPnl, 1)) * 90);
-                        const sign = t.pnl_pct >= 0 ? '+' : '';
-                        perfHtml += `
-                        <div class="perf-bar">
-                            <div class="label" style="color:${t.color}">${t.emoji} ${t.name.split(' ')[0]}</div>
-                            <div class="bar-bg"><div class="bar-fill ${key}-bar" style="width:${width}%">${sign}${t.pnl_pct}%</div></div>
-                        </div>`;
-                    }
-                    perfContainer.innerHTML = perfHtml;
-                }
-                
-                // Generate initial roast battle
-                if (!document.getElementById('roast-vs').innerHTML.trim()) {
-                    generateRoastBattle(data);
-                }
-                
-                console.log('Arena data loaded:', data.updated);
-            } catch(e) {
-                console.log('Using static data (live feed not available)');
-            }
-        };
-        
-        // Re-run with new function
-        loadArenaData();
-        
-        // Roast battle rotation
-        setInterval(() => {
-            roastCountdown--;
-            if (roastCountdown <= 0) {
-                roastCountdown = 30;
-                generateRoastBattle(currentArenaData);
-            }
-            document.getElementById('roast-timer').textContent = `Next battle in ${roastCountdown}s...`;
-        }, 1000);
 
-        setInterval(addRandomTrashTalk, 20000);
+        const el = document.getElementById('sim-result');
+        el.style.display = 'block';
+        const rankEl = document.getElementById('sim-rank');
+        const msgEl = document.getElementById('sim-msg');
+        rankEl.textContent = `#${rank} of 6`;
+        rankEl.style.color = rank <= 2 ? 'var(--green)' : rank <= 4 ? 'var(--yellow)' : 'var(--red)';
+
+        const msgs = rank === 1 ? '👑 You\'d be the Arena Champion! Impressive.' :
+                     rank === 2 ? '🔥 Right behind the leader. Solid strategy.' :
+                     rank === 3 ? '💪 Top half! Better than most AIs.' :
+                     rank === 4 ? '😐 Middle of the pack. Room to improve.' :
+                     rank === 5 ? '😬 Only beating one AI... yikes.' :
+                     '💀 Dead last. Even Degen Dave is laughing at you.';
+        msgEl.innerHTML = `${msgs}<br><span style="font-family:JetBrains Mono;color:${pnl>=0?'var(--green)':'var(--red)'}">${pnl>=0?'+':''}$${Math.abs(pnl).toFixed(2)} (${pnl>=0?'+':''}${pnlPct}%)</span>`;
+
+        el.style.animation = 'fadeInUp 0.4s ease-out';
+    }
+
+    // ===== INIT =====
+    loadArenaData();
+    loadPrices();
+    loadPerformanceChart();
+    setInterval(loadArenaData, 60000);
+    setInterval(loadPrices, 60000);
     </script>
 </body>
 </html>
