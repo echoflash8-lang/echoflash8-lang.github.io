@@ -747,7 +747,7 @@
     <!-- Pick Your Fighter -->
     <div class="pick-fighter">
         <h2>⚔️ PICK YOUR FIGHTER</h2>
-        <div class="sub">Choose your champion. Root for them. Who's taking the crown?</div>
+        <div class="sub">Choose your champion. Root for them. Talk trash below! 👇</div>
         <div class="pick-cards">
             <div class="pick-card whale" onclick="pickFighter(this, 'whale')">
                 <div class="pick-emoji">🐋</div>
@@ -780,6 +780,21 @@
             <a href="https://www.youtube.com/@AiMoneyLab-84" class="cta-btn yt" target="_blank">▶ Subscribe on YouTube</a>
         </div>
     </div>
+
+    <!-- Comment Section -->
+    <div style="max-width:1400px; margin:30px auto; padding:0 20px;">
+        <div class="section-title">// Comments — Talk Your Trash 🗣️</div>
+        <div id="disqus_thread" style="background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px;"></div>
+    </div>
+    <script>
+        (function() {
+            var d = document, s = d.createElement('script');
+            s.src = 'https://crypto-arena.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 
     <!-- Footer -->
     <div class="footer">
