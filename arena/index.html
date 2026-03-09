@@ -23,9 +23,9 @@
             --orange: #ff8800;
             --blue: #3b82f6;
             --ice: #88ddff;
-            --text: #e0e0e0;
-            --muted: #666;
-            --dim: #333;
+            --text: #f0f0f0;
+            --muted: #999;
+            --dim: #666;
         }
         body {
             font-family: 'Inter', sans-serif;
@@ -165,7 +165,7 @@
         }
         .ticker-content .up { color: var(--green); }
         .ticker-content .down { color: var(--red); }
-        .ticker-content .sep { color: #222; margin: 0 20px; }
+        .ticker-content .sep { color: #888; margin: 0 20px; }
 
         /* ===== STATS BAR ===== */
         .stats-bar {
@@ -196,7 +196,7 @@
         }
         .stat .lbl {
             font-size: 0.6rem;
-            color: #444;
+            color: #999;
             text-transform: uppercase;
             letter-spacing: 2px;
             margin-top: 4px;
@@ -338,7 +338,7 @@
             padding: 3px 8px;
             border-radius: 6px;
             background: rgba(255,255,255,0.05);
-            color: #555;
+            color: #aaa;
         }
         .fighter.rank-1 .rank-badge { background: rgba(255,214,0,0.15); color: var(--yellow); }
         .fighter.rank-2 .rank-badge { background: rgba(192,192,192,0.1); color: #ccc; }
@@ -407,7 +407,7 @@
         .risk-meter { margin-bottom: 14px; }
         .risk-label {
             font-size: 0.6rem;
-            color: #555;
+            color: #aaa;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 4px;
@@ -442,7 +442,7 @@
         }
         .holding:last-child { border-bottom: none; }
         .holding .coin { font-weight: 600; font-family: 'JetBrains Mono', monospace; }
-        .holding .alloc { font-family: 'JetBrains Mono', monospace; color: #555; font-size: 0.7rem; }
+        .holding .alloc { font-family: 'JetBrains Mono', monospace; color: #aaa; font-size: 0.7rem; }
 
         /* ===== PERFORMANCE TIMELINE ===== */
         .timeline-section {
@@ -573,7 +573,7 @@
             text-align: center;
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.6rem;
-            color: #333;
+            color: #888;
             margin-top: 14px;
             letter-spacing: 3px;
         }
@@ -604,7 +604,7 @@
             font-size: 0.8rem;
         }
         .trade:last-child { border-bottom: none; }
-        .trade .time { font-family: 'JetBrains Mono', monospace; color: #333; font-size: 0.7rem; min-width: 50px; }
+        .trade .time { font-family: 'JetBrains Mono', monospace; color: #888; font-size: 0.7rem; min-width: 50px; }
         .trade .trader { font-weight: 600; min-width: 130px; }
         .trade .action {
             font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.65rem;
@@ -612,7 +612,7 @@
         }
         .trade .action.buy { background: rgba(0,255,136,0.1); color: var(--green); }
         .trade .action.sell { background: rgba(255,51,102,0.1); color: var(--red); }
-        .trade .detail { color: #666; }
+        .trade .detail { color: #aaa; }
 
         /* ===== TRASH TALK ===== */
         .trash-talk {
@@ -634,7 +634,7 @@
         }
         .talk-bubble:hover { transform: translateY(-3px) scale(1.01); border-color: var(--border-hover); }
         .talk-bubble .speaker { font-weight: 700; font-size: 0.8rem; margin-bottom: 6px; }
-        .talk-bubble .quote { font-size: 0.78rem; color: #999; font-style: italic; line-height: 1.6; }
+        .talk-bubble .quote { font-size: 0.78rem; color: #ccc; font-style: italic; line-height: 1.6; }
 
         /* ===== CREATE YOUR FIGHTER ===== */
         .create-fighter {
@@ -670,7 +670,7 @@
             display: block;
             font-size: 0.65rem;
             font-family: 'JetBrains Mono', monospace;
-            color: #555;
+            color: #aaa;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 4px;
@@ -688,7 +688,7 @@
             transition: border-color 0.3s;
         }
         .sim-field input:focus { border-color: var(--cyan); }
-        .sim-field input::placeholder { color: #333; }
+        .sim-field input::placeholder { color: #888; }
         .sim-result {
             display: none;
             background: rgba(0,0,0,0.3);
@@ -740,7 +740,7 @@
         .pick-card:hover { transform: translateY(-8px); }
         .pick-card .pick-emoji { font-size: 2.5rem; margin-bottom: 8px; }
         .pick-card .pick-name { font-weight: 700; font-size: 0.85rem; margin-bottom: 4px; }
-        .pick-card .pick-fans { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: #555; }
+        .pick-card .pick-fans { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: #aaa; }
         .pick-card.whale:hover { border-color: var(--blue); box-shadow: 0 12px 40px rgba(59,130,246,0.15); }
         .pick-card.momentum:hover { border-color: var(--orange); box-shadow: 0 12px 40px rgba(255,136,0,0.15); }
         .pick-card.fundamentals:hover { border-color: var(--green); box-shadow: 0 12px 40px rgba(0,255,136,0.15); }
@@ -881,13 +881,13 @@
         .footer-main {
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.8rem;
-            color: #666;
+            color: #aaa;
             margin-bottom: 8px;
             letter-spacing: 1px;
         }
         .footer-sub {
             font-size: 0.7rem;
-            color: #333;
+            color: #888;
             font-family: 'JetBrains Mono', monospace;
             letter-spacing: 1px;
         }
@@ -1334,7 +1334,7 @@
                 }
             });
         } catch(e) {
-            document.getElementById('perfChart').parentElement.innerHTML = '<p style="color:#333;text-align:center;padding:50px;font-family:JetBrains Mono;font-size:0.75rem;">📊 Chart builds over time — more data points coming daily</p>';
+            document.getElementById('perfChart').parentElement.innerHTML = '<p style="color:#888;text-align:center;padding:50px;font-family:JetBrains Mono;font-size:0.75rem;">📊 Chart builds over time — more data points coming daily</p>';
         }
     }
 
