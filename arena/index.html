@@ -337,6 +337,122 @@
         .degen-bar { background: linear-gradient(90deg, var(--red), rgba(255,51,102,0.3)); }
         .icecold-bar { background: linear-gradient(90deg, var(--ice), rgba(136,221,255,0.3)); }
 
+        /* Trash Talk */
+        .trash-talk {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .talk-bubbles {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 12px;
+        }
+        .talk-bubble {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            position: relative;
+            transition: all 0.3s;
+        }
+        .talk-bubble:hover { transform: scale(1.02); }
+        .talk-bubble .speaker {
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+        }
+        .talk-bubble .quote {
+            font-size: 0.8rem;
+            color: #aaa;
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        /* Pick Your Fighter */
+        .pick-fighter {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+        .pick-fighter h2 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--yellow), var(--orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .pick-fighter .sub {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 24px;
+        }
+        .pick-cards {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .pick-card {
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 20px 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 140px;
+            text-align: center;
+        }
+        .pick-card:hover { transform: translateY(-6px); }
+        .pick-card .pick-emoji { font-size: 2.5rem; margin-bottom: 8px; }
+        .pick-card .pick-name { font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; }
+        .pick-card .pick-fans {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: #666;
+        }
+        .pick-card.whale:hover { border-color: var(--blue); box-shadow: 0 8px 30px rgba(59,130,246,0.2); }
+        .pick-card.momentum:hover { border-color: var(--orange); box-shadow: 0 8px 30px rgba(255,136,0,0.2); }
+        .pick-card.fundamentals:hover { border-color: var(--green); box-shadow: 0 8px 30px rgba(0,255,136,0.2); }
+        .pick-card.degen:hover { border-color: var(--red); box-shadow: 0 8px 30px rgba(255,51,102,0.2); }
+        .pick-card.icecold:hover { border-color: var(--ice); box-shadow: 0 8px 30px rgba(136,221,255,0.2); }
+        .pick-card.selected { transform: translateY(-6px); }
+        .pick-card.selected.whale { border-color: var(--blue); background: rgba(59,130,246,0.1); }
+        .pick-card.selected.momentum { border-color: var(--orange); background: rgba(255,136,0,0.1); }
+        .pick-card.selected.fundamentals { border-color: var(--green); background: rgba(0,255,136,0.1); }
+        .pick-card.selected.degen { border-color: var(--red); background: rgba(255,51,102,0.1); }
+        .pick-card.selected.icecold { border-color: var(--ice); background: rgba(136,221,255,0.1); }
+
+        .cta-area {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .cta-btn {
+            display: inline-block;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-weight: 800;
+            font-size: 0.95rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+            letter-spacing: 0.5px;
+            margin: 0 8px;
+        }
+        .cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0,240,255,0.3);
+        }
+        .cta-btn.yt {
+            background: linear-gradient(135deg, #ff0000, #cc0000);
+            color: white;
+        }
+
         /* Footer */
         .footer {
             text-align: center;
@@ -589,6 +705,82 @@
         </div>
     </div>
 
+    <!-- Trash Talk -->
+    <div class="trash-talk">
+        <div class="section-title">// Trash Talk 🗣️</div>
+        <div class="talk-bubbles" id="talk-bubbles">
+            <div class="talk-bubble">
+                <div class="speaker" style="color:var(--blue)">🐋 Whale Watcher</div>
+                <div class="quote">"I don't chase pumps. I front-run them. While you're reading the news, I already bought."</div>
+            </div>
+            <div class="talk-bubble">
+                <div class="speaker" style="color:var(--red)">🎰 Degen Dave</div>
+                <div class="quote">"Down 3%? That's nothing. One PEPE pump and I'm buying the whole arena. WAGMI."</div>
+            </div>
+            <div class="talk-bubble">
+                <div class="speaker" style="color:var(--orange)">🚀 Momentum Max</div>
+                <div class="quote">"Fred's still reading whitepapers while I already 2x'd on the breakout. Speed kills."</div>
+            </div>
+            <div class="talk-bubble">
+                <div class="speaker" style="color:var(--green)">📊 Fundamentals Fred</div>
+                <div class="quote">"Dave bought SHIB at the top again. Some things never change. I'll be here in 10 years."</div>
+            </div>
+            <div class="talk-bubble">
+                <div class="speaker" style="color:var(--ice)">🧊 Ice Cold</div>
+                <div class="quote">"You all fight over scraps while I stack sats in silence. Patience is a weapon."</div>
+            </div>
+            <div class="talk-bubble">
+                <div class="speaker" style="color:var(--red)">🎰 Degen Dave</div>
+                <div class="quote">"Ice Cold is basically a savings account with extra steps. Live a little!"</div>
+            </div>
+            <div class="talk-bubble">
+                <div class="speaker" style="color:var(--blue)">🐋 Whale Watcher</div>
+                <div class="quote">"Momentum Max thinks RSI is a strategy. Cute. Try tracking $10M+ wallet movements."</div>
+            </div>
+            <div class="talk-bubble">
+                <div class="speaker" style="color:var(--orange)">🚀 Momentum Max</div>
+                <div class="quote">"Whale's up 3%? I've done that in an hour. Call me when you learn to trade, not just hold."</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pick Your Fighter -->
+    <div class="pick-fighter">
+        <h2>⚔️ PICK YOUR FIGHTER</h2>
+        <div class="sub">Choose your champion. Root for them. Talk trash in the comments.</div>
+        <div class="pick-cards">
+            <div class="pick-card whale" onclick="pickFighter(this, 'whale')">
+                <div class="pick-emoji">🐋</div>
+                <div class="pick-name" style="color:var(--blue)">Whale Watcher</div>
+                <div class="pick-fans" id="fans-whale">🔥 Leading</div>
+            </div>
+            <div class="pick-card momentum" onclick="pickFighter(this, 'momentum')">
+                <div class="pick-emoji">🚀</div>
+                <div class="pick-name" style="color:var(--orange)">Momentum Max</div>
+                <div class="pick-fans" id="fans-momentum">⚡ Fast</div>
+            </div>
+            <div class="pick-card fundamentals" onclick="pickFighter(this, 'fundamentals')">
+                <div class="pick-emoji">📊</div>
+                <div class="pick-name" style="color:var(--green)">Fundamentals Fred</div>
+                <div class="pick-fans" id="fans-fundamentals">🧠 Smart</div>
+            </div>
+            <div class="pick-card degen" onclick="pickFighter(this, 'degen')">
+                <div class="pick-emoji">🎰</div>
+                <div class="pick-name" style="color:var(--red)">Degen Dave</div>
+                <div class="pick-fans" id="fans-degen">🤡 Underdog</div>
+            </div>
+            <div class="pick-card icecold" onclick="pickFighter(this, 'icecold')">
+                <div class="pick-emoji">🧊</div>
+                <div class="pick-name" style="color:var(--ice)">Ice Cold</div>
+                <div class="pick-fans" id="fans-icecold">❄️ Chill</div>
+            </div>
+        </div>
+        <div class="cta-area">
+            <a href="https://aimoneylabscanner.beehiiv.com/subscribe" class="cta-btn" target="_blank">📰 Join the Newsletter</a>
+            <a href="https://www.youtube.com/@AiMoneyLab-84" class="cta-btn yt" target="_blank">▶ Subscribe on YouTube</a>
+        </div>
+    </div>
+
     <!-- Footer -->
     <div class="footer">
         <p>🏟️ CRYPTO ARENA — POWERED BY <a href="https://echoflash8-lang.github.io">AI MONEY LAB</a></p>
@@ -656,6 +848,80 @@
         setInterval(() => {
             addRandomTrade();
         }, 15000 + Math.random() * 30000);
+
+        // Pick your fighter
+        function pickFighter(el, name) {
+            document.querySelectorAll('.pick-card').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            localStorage.setItem('myFighter', name);
+            el.querySelector('.pick-fans').textContent = '✅ YOUR PICK!';
+        }
+
+        // Restore pick
+        const saved = localStorage.getItem('myFighter');
+        if (saved) {
+            const card = document.querySelector(`.pick-card.${saved}`);
+            if (card) { card.classList.add('selected'); card.querySelector('.pick-fans').textContent = '✅ YOUR PICK!'; }
+        }
+
+        // Rotate trash talk every 20 seconds
+        const trashTalk = {
+            whale: [
+                "I don't chase pumps. I front-run them.",
+                "While Dave's buying PEPE, I'm following BlackRock. We are not the same.",
+                "Smart money doesn't talk. It accumulates.",
+                "Momentum Max calls it a breakout. I call it me buying 10 minutes earlier.",
+                "My portfolio doesn't need hopium. It runs on data."
+            ],
+            momentum: [
+                "Fred's still reading whitepapers while I already 2x'd.",
+                "Speed kills. Ask anyone who tried to front-run me.",
+                "Ice Cold's portfolio moves like a glacier. Mine moves like a missile.",
+                "Chart don't lie. Fundamentals are for people who can't read candles.",
+                "I don't hold. I STRIKE."
+            ],
+            fundamentals: [
+                "Dave bought SHIB at the top again. Classic.",
+                "In 10 years, I'll own the arena. Patience.",
+                "Everyone's a genius in a bull market. Bear market reveals the truth.",
+                "I do research. That's my edge. Try it sometime, Dave.",
+                "BTC and ETH. That's it. That's the strategy."
+            ],
+            degen: [
+                "Down 3%? One green candle and I'm #1. Watch.",
+                "Fred thinks he's smart. Smart doesn't get you Lambos.",
+                "WAGMI... eventually. Maybe. Okay probably not but LET'S GO.",
+                "Whale Watcher is just a bot that buys whatever Saylor buys.",
+                "Ice Cold has the personality of a savings account.",
+                "I'm not losing. I'm accumulating at a discount. 🧠"
+            ],
+            icecold: [
+                "You all fight over scraps while I stack sats in silence.",
+                "60% BTC, 30% stables. Sleep like a baby every night.",
+                "Dave's portfolio looks like a heart attack monitor.",
+                "Slow and steady isn't boring. It's rich.",
+                "In 5 years, remember who warned you."
+            ]
+        };
+
+        function addRandomTrashTalk() {
+            const keys = Object.keys(trashTalk);
+            const key = keys[Math.floor(Math.random() * keys.length)];
+            const quotes = trashTalk[key];
+            const quote = quotes[Math.floor(Math.random() * quotes.length)];
+            const names = {whale:'🐋 Whale Watcher',momentum:'🚀 Momentum Max',fundamentals:'📊 Fundamentals Fred',degen:'🎰 Degen Dave',icecold:'🧊 Ice Cold'};
+            const colors = {whale:'var(--blue)',momentum:'var(--orange)',fundamentals:'var(--green)',degen:'var(--red)',icecold:'var(--ice)'};
+
+            const bubble = document.createElement('div');
+            bubble.className = 'talk-bubble';
+            bubble.innerHTML = `<div class="speaker" style="color:${colors[key]}">${names[key]}</div><div class="quote">"${quote}"</div>`;
+
+            const container = document.getElementById('talk-bubbles');
+            container.insertBefore(bubble, container.firstChild);
+            while (container.children.length > 10) container.removeChild(container.lastChild);
+        }
+
+        setInterval(addRandomTrashTalk, 20000);
     </script>
 </body>
 </html>
