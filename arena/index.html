@@ -746,12 +746,32 @@
         .pick-card.fundamentals:hover { border-color: var(--green); box-shadow: 0 12px 40px rgba(0,255,136,0.15); }
         .pick-card.degen:hover { border-color: var(--red); box-shadow: 0 12px 40px rgba(255,51,102,0.15); }
         .pick-card.icecold:hover { border-color: var(--ice); box-shadow: 0 12px 40px rgba(136,221,255,0.15); }
-        .pick-card.selected { transform: translateY(-6px); }
-        .pick-card.selected.whale { border-color: var(--blue); background: rgba(59,130,246,0.08); }
-        .pick-card.selected.momentum { border-color: var(--orange); background: rgba(255,136,0,0.08); }
-        .pick-card.selected.fundamentals { border-color: var(--green); background: rgba(0,255,136,0.08); }
-        .pick-card.selected.degen { border-color: var(--red); background: rgba(255,51,102,0.08); }
-        .pick-card.selected.icecold { border-color: var(--ice); background: rgba(136,221,255,0.08); }
+        .pick-card.selected { transform: translateY(-8px) scale(1.05); }
+        .pick-card.selected.whale { border-color: var(--blue); background: rgba(59,130,246,0.15); box-shadow: 0 0 30px rgba(59,130,246,0.3), 0 12px 40px rgba(59,130,246,0.15); }
+        .pick-card.selected.momentum { border-color: var(--orange); background: rgba(255,136,0,0.15); box-shadow: 0 0 30px rgba(255,136,0,0.3), 0 12px 40px rgba(255,136,0,0.15); }
+        .pick-card.selected.fundamentals { border-color: var(--green); background: rgba(0,255,136,0.15); box-shadow: 0 0 30px rgba(0,255,136,0.3), 0 12px 40px rgba(0,255,136,0.15); }
+        .pick-card.selected.degen { border-color: var(--red); background: rgba(255,51,102,0.15); box-shadow: 0 0 30px rgba(255,51,102,0.3), 0 12px 40px rgba(255,51,102,0.15); }
+        .pick-card.selected.icecold { border-color: var(--ice); background: rgba(136,221,255,0.15); box-shadow: 0 0 30px rgba(136,221,255,0.3), 0 12px 40px rgba(136,221,255,0.15); }
+        
+        /* Pick confirmation toast */
+        .pick-toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: rgba(0,0,0,0.9);
+            border: 1px solid var(--cyan);
+            border-radius: 12px;
+            padding: 14px 28px;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--cyan);
+            z-index: 9999;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 30px rgba(0,240,255,0.2);
+            pointer-events: none;
+        }
+        .pick-toast.show { transform: translateX(-50%) translateY(0); }
 
         /* ===== CTA ===== */
         .cta-area { margin-top: 30px; text-align: center; }
@@ -1082,6 +1102,9 @@
             <a href="https://www.youtube.com/@AiMoneyLab-84" class="cta-btn yt" target="_blank">▶ Subscribe on YouTube</a>
         </div>
     </div>
+
+    <!-- Pick Toast -->
+    <div class="pick-toast" id="pick-toast"></div>
 
     <!-- Comments -->
     <div style="max-width:1400px;margin:30px auto;padding:0 20px;">
@@ -1456,10 +1479,30 @@
 
     // ===== PICK FIGHTER =====
     function pickFighter(el, name) {
-        document.querySelectorAll('.pick-card').forEach(c=>c.classList.remove('selected'));
+        // Reset all
+        document.querySelectorAll('.pick-card').forEach(c => {
+            c.classList.remove('selected');
+            const fans = c.querySelector('.pick-fans');
+            if (fans && fans.textContent.includes('YOUR PICK')) {
+                const labels = {whale:'🔥 Leading',momentum:'⚡ Fast',fundamentals:'🧠 Smart',degen:'🤡 Underdog',icecold:'❄️ Chill'};
+                const cls = Array.from(c.classList).find(cl => labels[cl]);
+                if (cls) fans.textContent = labels[cls];
+            }
+        });
+        // Select
         el.classList.add('selected');
         localStorage.setItem('myFighter', name);
-        el.querySelector('.pick-fans').textContent = '✅ YOUR PICK';
+        el.querySelector('.pick-fans').textContent = '✅ YOUR PICK!';
+        
+        // Show toast
+        const names = {whale:'🐋 Whale Watcher',momentum:'🚀 Momentum Max',fundamentals:'📊 Fundamentals Fred',degen:'🎰 Degen Dave',icecold:'🧊 Ice Cold'};
+        const toast = document.getElementById('pick-toast');
+        toast.textContent = `⚔️ You picked ${names[name]}!`;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+        
+        // Scroll card into better view
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
     const saved = localStorage.getItem('myFighter');
     if (saved) { const c = document.querySelector(`.pick-card.${saved}`); if(c){c.classList.add('selected');c.querySelector('.pick-fans').textContent='✅ YOUR PICK';} }
